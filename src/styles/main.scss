@@ -68,3 +68,43 @@ body {
     border: 1px solid var(--primary-blue, #0038FF);
     background: #FBFCFF;
   }
+
+    .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+  }
+
+  .title {
+    color: #000;
+    font-family: Inter;
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .truncated {
+    display: inline-block;
+    max-width: 152px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  .connected-wallet-details {
+    color: #5A5A5A;
+    font-family: Outfit;
+    font-size: 1.0625rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
