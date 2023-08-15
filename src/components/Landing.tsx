@@ -1,25 +1,16 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+import MarloweSDK from '../services/MarloweSDK';
 // import { currentWalletStore, marloweSDKStore } from './stores';
 
-const Landing = () => {
-  const history = useNavigate();
-  // let marloweSDK;
+type LandingProps = {
+  sdk: MarloweSDK;
+};
 
-  // const unsubscribeMarloweSDK = marloweSDKStore.subscribe(sdk => marloweSDK = sdk);
-
-  // useEffect(() => {
-  //   return () => {
-  //     unsubscribeMarloweSDK();
-  //   };
-  // }, []);
-
-  async function connectWallet(walletName:String) {
-    return walletName;
-    // await marloweSDK.connectWallet(walletName);
-    // const connectedWallet = marloweSDK.getConnectedWallet();
-    // await currentWalletStore.set(connectedWallet);
-    // history.push('/payouts');
+const Landing: React.FC<LandingProps> = ({sdk}) => {
+  async function connectWallet(walletName:string) {
+    await sdk.connectWallet(walletName);
+    const connectedWallet = sdk.getConnectedWallet();
   }
 
   return (
