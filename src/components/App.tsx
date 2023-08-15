@@ -12,7 +12,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Landing sdk={sdk} />} />
-        <Route path="/payouts" element={<Payouts />} />
+        <Route path="/payouts" element={<Payouts sdk={sdk} />} />
       </Routes>
     </Router>
   );

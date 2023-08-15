@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
 // import { currentWalletStore, marloweSDKStore } from './stores';
 
@@ -8,9 +8,12 @@ type LandingProps = {
 };
 
 const Landing: React.FC<LandingProps> = ({sdk}) => {
+  const navigate = useNavigate();
+
   async function connectWallet(walletName:string) {
     await sdk.connectWallet(walletName);
     const connectedWallet = sdk.getConnectedWallet();
+    navigate('/payouts');
   }
 
   return (
