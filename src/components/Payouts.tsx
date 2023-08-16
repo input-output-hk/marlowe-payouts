@@ -9,14 +9,12 @@ import ToastMessage from './ToastMessage';
 // import PayoutModal from './components/PayoutModal';
 
 type PayoutsProps = {
-  sdk: MarloweSDK
+  sdk: MarloweSDK,
+  setAndShowToast: (title:string, message:any) => void
 };
 
-const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
-  const [showToast, setShowToast] = useState(false);
-  const [toastTitle, setToastTitle] = useState('');
-  const [toastMessage, setToastMessage] = useState(<div></div>);
-  // const [selectedPayout, setSelectedPayout] = useState(null);
+const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
+ // const [selectedPayout, setSelectedPayout] = useState(null);
   // const [showModal, setShowModal] = useState(false);
   const changeAddress = sdk.changeAddress || '';
   const truncatedAddress = changeAddress.slice(0,18);
@@ -26,9 +24,10 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(changeAddress);
-      setToastTitle('Address copied to clipboard');
-      setToastMessage(<span>Copied <span className="font-weight-bold">{changeAddress}</span> to clipboard</span>);
-      setShowToast(true);
+      setAndShowToast(
+        'Address copied to clipboard',
+        <span>Copied <span className="font-weight-bold">{changeAddress}</span> to clipboard</span>
+      );
     } catch (err) {
       console.error('Failed to copy address: ', err);
     }
@@ -42,6 +41,10 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
   const disconnectWallet = () => {
     sdk.disconnectWallet();
     localStorage.setItem('walletProvider', '');
+    setAndShowToast(
+      'Disconnected wallet',
+      <span>Please connect a wallet to see a list of available payouts.</span>
+    );
     navigate('/');
   }
 
@@ -75,13 +78,6 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
       <p className="title">Select rewards to withdraw</p>
       <div className="grid my-5">
       </div>
-      <ToastMessage
-        title={toastTitle}
-        message={toastMessage}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
-
       {/* {showModal && <PayoutModal payout={selectedPayout} onClose={() => setShowModal(false)} />} */}
     </div>
   );

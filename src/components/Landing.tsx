@@ -4,9 +4,10 @@ import MarloweSDK from '../services/MarloweSDK';
 
 type LandingProps = {
   sdk: MarloweSDK;
+  setAndShowToast: (title:string, message:any) => void
 };
 
-const Landing: React.FC<LandingProps> = ({sdk}) => {
+const Landing: React.FC<LandingProps> = ({sdk, setAndShowToast}) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +32,10 @@ const Landing: React.FC<LandingProps> = ({sdk}) => {
     if (connectedWallet) {
       localStorage.setItem('walletProvider', walletName);
     }
+    setAndShowToast(
+      `Sucessfully connected ${walletName} wallet`,
+      <span>You can now see a list of available payouts for your {walletName} wallet!</span>
+    );
     navigate('/payouts');
   }
 
