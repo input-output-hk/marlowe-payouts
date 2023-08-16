@@ -33,6 +33,12 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
   //   setShowModal(true);
   // };
 
+  const disconnectWallet = () => {
+    sdk.disconnectWallet();
+    localStorage.setItem('walletProvider', '');
+    navigate('/');
+  }
+
   const tokens1 = [
     { id: 1, tokenName: "TokenA", currencySymbol: "TA", amount: 100 },
     { id: 2, tokenName: "TokenB", currencySymbol: "TB", amount: 200 }
@@ -78,7 +84,19 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
       <div className="header">
         <img src="/images/marlowe-logo-primary.svg" alt="Logo" className="mb-4" />
         <div className="connected-wallet-details">
-          <span className="truncated">{truncatedAddress}</span>
+          <div className="dropdown">
+            <button className="btn btn-light btn-sm dropdown-toggle" title="menu" data-bs-toggle="dropdown" aria-expanded="false">
+              <span className="truncated">{truncatedAddress}</span>
+            </button>
+            <ul className="dropdown-menu">
+              <li>
+                <button className="dropdown-item" type="button" onClick={() => disconnectWallet()}>
+                  Disconnect wallet
+                  <img src="/images/electrical_services.svg" alt="icon" style={{ marginLeft: '8px' }} />
+                </button>
+              </li>
+            </ul>
+          </div>
           <button className="btn btn-light btn-sm" title="Copy Address" onClick={copyToClipboard}>
             <img src="/images/content_copy.svg" alt="content-copy" />
           </button>

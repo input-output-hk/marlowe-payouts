@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
-// import { currentWalletStore, marloweSDKStore } from './stores';
 
 type LandingProps = {
   sdk: MarloweSDK;
