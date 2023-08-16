@@ -1,8 +1,9 @@
 // Payouts.tsx
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
+import ToastMessage from './ToastMessage';
 
 // import Card from './components/card/Card';
 // import PayoutModal from './components/PayoutModal';
@@ -12,6 +13,9 @@ type PayoutsProps = {
 };
 
 const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
+  const [showToast, setShowToast] = useState(false);
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastMessage, setToastMessage] = useState(<div></div>);
   // const [selectedPayout, setSelectedPayout] = useState(null);
   // const [showModal, setShowModal] = useState(false);
   const changeAddress = sdk.changeAddress || '';
@@ -22,7 +26,9 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(changeAddress);
-      console.log('Address copied to clipboard');
+      setToastTitle('Address copied to clipboard');
+      setToastMessage(<span>Copied <span className="font-weight-bold">{changeAddress}</span> to clipboard</span>);
+      setShowToast(true);
     } catch (err) {
       console.error('Failed to copy address: ', err);
     }
@@ -69,6 +75,13 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
       <p className="title">Select rewards to withdraw</p>
       <div className="grid my-5">
       </div>
+      <ToastMessage
+        title={toastTitle}
+        message={toastMessage}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
+
       {/* {showModal && <PayoutModal payout={selectedPayout} onClose={() => setShowModal(false)} />} */}
     </div>
   );
