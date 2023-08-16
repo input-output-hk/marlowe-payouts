@@ -55,8 +55,8 @@ const Landing: React.FC<LandingProps> = ({sdk, setAndShowToast}) => {
                 <div className="container">
                   <div className="row">
                     <div className="col-12">
-                      <h5 className="card-title">Choose a wallet</h5>
-                      <p className="card-help-text">Please select a wallet to view rewards.</p>
+                      <h5 className="card-title font-weight-bold text-left">Choose a wallet</h5>
+                      <p className="card-help-text text-left">Please select a wallet to view rewards.</p>
                     </div>
                   </div>
                   <div className="row mt-2">
@@ -77,6 +77,15 @@ const Landing: React.FC<LandingProps> = ({sdk, setAndShowToast}) => {
                         <img src="https://s3-alpha-sig.figma.com/img/86d7/e924/af46237d72b394a9b4c58e515a1c641a?Expires=1693180800&Signature=R5iFCC-GCNGa6baiVaKxGpxwQCMsrPLQtwnLGS-mEkU2lMs644bSsrzO6d43jYX1J~PdeAjClhhlws9rZwZidkTMN7PjWQwcyOw8rh9CgXNvyL9doyZr9STpdgKvE8n1v4HU4vJ2Gk16cld9Wl~hTYIdOmkJfaBZHMyLldLoxoaYWL~YLwcgP9yO8e~9B76l7U0GLixGS3FOQ3--NvgVqzquOVsqCtO7lP8g7WE9NNjihAqRLQb6fUFQ8H6jEn0n61OcvMwiPkLoLuNS5rgMcehJWbAznbyBeDoalopgYUwlyJIC8Hl6Tvsf0sYJosCsJvkbtI3SEAxgSnFpnkiE0Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="Icon After" className="icon-after" />
                         Cardano
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="row mt-4">
+                    <div className="col-6 text-left p-0">
+                      <a href="#" >Learn more</a>
+                    </div>
+                    <div className="col-6 p-0">
+                      <a href="#" className="text-muted text-right text-decoration-none">I don't have a wallet</a>
                     </div>
                   </div>
                 </div>
