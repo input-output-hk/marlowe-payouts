@@ -90,7 +90,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
                 <td>{payout.name}</td>
                 <td>{payout.amount}</td>
                 <td>
-                  <button className="btn btn-primary btn-sm" onClick={async () => await sdk.withdraw(payout.id)}>
+                  <button className="btn btn-outline-primary font-weight-bold" onClick={async () => await sdk.withdraw(payout.id)}>
                     Withdraw
                   </button>
                 </td>
