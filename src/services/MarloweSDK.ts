@@ -1,3 +1,5 @@
+import { Blockfrost, Lucid } from "lucid-cardano";
+
 type Wallet = {
   enable: () => Promise<any>;
   getChangeAddress: () => Promise<string>;
@@ -9,6 +11,7 @@ class MarloweSDK {
   lovelaceBalance: number;
   changeAddress: string | null;
   payouts: any[];
+  lucid: Lucid | null;
 
   constructor() {
     this.validWalletNames = [
@@ -54,6 +57,8 @@ class MarloweSDK {
 
     this.payouts = payouts;
 
+    this.lucid = null;
+
   }
 
   getPayouts() {
@@ -74,8 +79,15 @@ class MarloweSDK {
     console.log(`Connecting to ${walletName}`)
     try {
       if (this.validWalletNames.includes(walletName)) {
+        const lucid = await Lucid.new(
+          new Blockfrost("https://cardano-preview.blockfrost.io/api/v0", "previewGstJmKGkWEnJetz8heF9Gfs6q4FbOvc0"),
+          "Preview",
+        );
         const wallet = await (window as any).cardano[walletName].enable();
+        lucid.selectWallet(wallet);
+        this.lucid = lucid;
         this.connectedWallet = wallet;
+        console.log(lucid);
         await this.setChangeAddress();
       } else {
         console.log(
