@@ -34,15 +34,21 @@ class MarloweSDK {
   }
 
   async connectWallet(walletName: string): Promise<void> {
-    if (this.validWalletNames.includes(walletName)) {
-      const wallet = await (window as any).cardano[walletName].enable();
-      this.connectedWallet = wallet;
-      await this.setChangeAddress();
-    } else {
-      console.log(
-        `Please select from accepted wallets ${this.validWalletNames.join(', ')}`
-      );
+    console.log(`Connecting to ${walletName}`)
+    try {
+      if (this.validWalletNames.includes(walletName)) {
+        const wallet = await (window as any).cardano[walletName].enable();
+        this.connectedWallet = wallet;
+        await this.setChangeAddress();
+      } else {
+        console.log(
+          `Please select from accepted wallets ${this.validWalletNames.join(', ')}`
+        );
+      }
+    } catch (e) {
+      console.log("FAILED TO CONNECT WALLET: ", e);
     }
+
   }
 
   disconnectWallet(): void {

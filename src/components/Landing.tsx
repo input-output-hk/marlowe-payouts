@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
 // import { currentWalletStore, marloweSDKStore } from './stores';
@@ -10,9 +10,27 @@ type LandingProps = {
 const Landing: React.FC<LandingProps> = ({sdk}) => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const walletProvider = localStorage.getItem('walletProvider');
+    if (walletProvider) {
+      try {
+        (async () => {
+          await sdk.connectWallet(walletProvider);
+          navigate('/payouts');
+        })();
+      } catch (e) {
+        localStorage.setItem('walletProvider', '');
+      }
+    }
+  }, [sdk, navigate]);
+
+
   async function connectWallet(walletName:string) {
     await sdk.connectWallet(walletName);
     const connectedWallet = sdk.getConnectedWallet();
+    if (connectedWallet) {
+      localStorage.setItem('walletProvider', walletName);
+    }
     navigate('/payouts');
   }
 
@@ -37,7 +55,7 @@ const Landing: React.FC<LandingProps> = ({sdk}) => {
                     </div>
                   </div>
                   <div className="row mt-2">
-                    <div className="col-12 bordered-container" onClick={() => connectWallet("nami")} data-walletName="nami">
+                    <div className="col-12 bordered-container" onClick={() => connectWallet("nami")}>
                       <img src="/images/nami.svg" alt="Icon Before" className="icon" />
                       Nami Wallet
                       <div className="cardano-badge">
@@ -47,7 +65,7 @@ const Landing: React.FC<LandingProps> = ({sdk}) => {
                     </div>
                   </div>
                   <div className="row mt-2">
-                    <div className="col-12 bordered-container" onClick={() => connectWallet("eternl")} data-walletName="eternl">
+                    <div className="col-12 bordered-container" onClick={() => connectWallet("eternl")}>
                       <img aria-hidden="true" src="https://lh3.googleusercontent.com/XjJJJR7nnCSk7L4ZF1B62j2BN-A571wvxW2Nadc43UBrvqiUZBqEfpOjZfgjggYwERErKLWSVSSauT44gXkD_i2tdrY=w128-h128-e365-rj-sc0x00ffffff" style={{ width: '30px', height: '30px' }} />
                       Eternl
                       <div className="cardano-badge">

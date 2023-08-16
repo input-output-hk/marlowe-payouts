@@ -19,13 +19,6 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!sdk.getConnectedWallet()) {
-      navigate('/');
-    }
-  });
-
-
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(changeAddress);
