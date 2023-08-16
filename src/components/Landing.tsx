@@ -18,6 +18,7 @@ const Landing: React.FC<LandingProps> = ({sdk}) => {
           navigate('/payouts');
         })();
       } catch (e) {
+        console.log("USE EFFECT ON LANDNING PAGE FAILED: ", e)
         localStorage.setItem('walletProvider', '');
       }
     }
