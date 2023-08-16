@@ -3,10 +3,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
-import ToastMessage from './ToastMessage';
-
-// import Card from './components/card/Card';
-// import PayoutModal from './components/PayoutModal';
 
 type PayoutsProps = {
   sdk: MarloweSDK,
@@ -14,10 +10,9 @@ type PayoutsProps = {
 };
 
 const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
- // const [selectedPayout, setSelectedPayout] = useState(null);
-  // const [showModal, setShowModal] = useState(false);
   const changeAddress = sdk.changeAddress || '';
   const truncatedAddress = changeAddress.slice(0,18);
+  const payouts = sdk.getPayouts();
 
   const navigate = useNavigate();
 
@@ -39,11 +34,6 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
       console.error('Failed to copy address: ', err);
     }
   };
-
-  // const showPayoutDetails = (payout) => {
-  //   setSelectedPayout(payout);
-  //   setShowModal(true);
-  // };
 
   const disconnectWallet = () => {
     sdk.disconnectWallet();
@@ -83,9 +73,32 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
         </div>
       </div>
       <p className="title">Select rewards to withdraw</p>
-      <div className="grid my-5">
+      <div className="my-5">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {payouts.map((payout, index) => (
+              <tr key={index}>
+                <td>{payout.id}</td>
+                <td>{payout.name}</td>
+                <td>{payout.amount}</td>
+                <td>
+                  <button className="btn btn-primary btn-sm" onClick={async () => await sdk.withdraw(payout.id)}>
+                    Withdraw
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      {/* {showModal && <PayoutModal payout={selectedPayout} onClose={() => setShowModal(false)} />} */}
     </div>
   );
 };
