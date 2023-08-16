@@ -1,6 +1,6 @@
 // Payouts.tsx
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
 import ToastMessage from './ToastMessage';
@@ -20,6 +20,13 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   const truncatedAddress = changeAddress.slice(0,18);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const walletProvider = localStorage.getItem('walletProvider');
+    if (walletProvider && !changeAddress) {
+      navigate('/');
+    }
+  }, [changeAddress, navigate]);
 
   const copyToClipboard = async () => {
     try {
