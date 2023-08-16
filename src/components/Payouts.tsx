@@ -85,7 +85,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
         <img src="/images/marlowe-logo-primary.svg" alt="Logo" className="mb-4" />
         <div className="connected-wallet-details">
           <div className="dropdown">
-            <button className="btn btn-light btn-sm dropdown-toggle" title="menu" data-bs-toggle="dropdown" aria-expanded="false">
+            <button className="btn btn-light btn-sm dropdown-toggle mr-2" title="menu" data-bs-toggle="dropdown" aria-expanded="false">
               <span className="truncated">{truncatedAddress}</span>
             </button>
             <ul className="dropdown-menu">
@@ -96,13 +96,13 @@ const Payouts: React.FC<PayoutsProps> = ({sdk}) => {
                 </button>
               </li>
             </ul>
+            <button className="btn btn-light btn-sm mr-2" title="Copy Address" onClick={copyToClipboard}>
+              <img src="/images/content_copy.svg" alt="content-copy" />
+            </button>
+            <button className="btn btn-light btn-sm" title="Show QR Code">
+              <img src="/images/qr_code_2.svg" alt="QR Code" />
+            </button>
           </div>
-          <button className="btn btn-light btn-sm" title="Copy Address" onClick={copyToClipboard}>
-            <img src="/images/content_copy.svg" alt="content-copy" />
-          </button>
-          <button className="btn btn-light btn-sm" title="Show QR Code">
-            <img src="/images/qr_code_2.svg" alt="QR Code" />
-          </button>
         </div>
       </div>
       <p className="title">Select rewards to withdraw</p>
