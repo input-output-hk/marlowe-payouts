@@ -40,6 +40,7 @@ class MarloweSDK {
     const payout1 = new Payout(
       1,
       "Payout1",
+      5000000n,
       "/path/to/payout1-icon.jpg",
       "RoleToken1",
       "Withdraw",
@@ -49,6 +50,7 @@ class MarloweSDK {
     const payout2 = new Payout(
       2,
       "Payout2",
+      3000000n,
       "/path/to/payout2-icon.jpg",
       "RoleToken2",
       "Withdraw",
@@ -58,6 +60,7 @@ class MarloweSDK {
     const payout3 = new Payout(
       3,
       "Payout3",
+      23000000n,
       "/path/to/payout3-icon.jpg",
       "RoleToken3",
       "Withdraw",
@@ -68,6 +71,7 @@ class MarloweSDK {
     const payout4 = new Payout(
       4,
       "Payout4",
+      97000000n,
       "/path/to/payout4-icon.jpg",
       "RoleToken4",
       "Withdraw",
@@ -134,7 +138,7 @@ class MarloweSDK {
     return Promise.resolve(this.lovelaceBalance);
   }
 
-  async withdrawPayouts(payoutId:string[], successCallback:any): Promise<void> {
+  async withdrawPayouts(payouts:Payout[], successCallback:any): Promise<void> {
     const lucid = this.getLucid();
     // const changeAddress = this.changeAddress;
     // const changeAddress = "addr_test1qqc3suxnrnsejezh8yzg3qzfupxqn65v5dem2rpnmr60rvgv2ckqzwjtp8w854ua4rd3udc08y5hlnxz82xhml96967saa9fdr";
@@ -142,8 +146,8 @@ class MarloweSDK {
     if (lucid && changeAddress) {
       let tx = await lucid.newTx()
 
-      payoutId.forEach(async (id) => {
-        tx = await tx.payToAddress(changeAddress, { lovelace: 5000000n })
+      payouts.forEach(async (payout) => {
+        tx = await tx.payToAddress(changeAddress, { lovelace: payout.amount })
       })
 
       const completeTransaction = await tx.complete();

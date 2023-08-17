@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
+import PayoutsModal from './PayoutsModal';
 
 type PayoutsProps = {
   sdk: MarloweSDK,
@@ -16,6 +17,15 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   const navigate = useNavigate();
   const [payoutsToBePaidIds, setPayoutsToBePaidIds] = useState<string[]>([]);
   const [payouts, setPayouts] = useState<any[]>(sdkPayouts);
+  const [showModal, setShowModal] = useState(false);
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     const walletProvider = localStorage.getItem('walletProvider');
@@ -59,7 +69,8 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
     try {
-      await sdk.withdrawPayouts(payoutsToBePaidIds,
+      const filteredPayouts = payouts.filter(payout => payoutsToBePaidIds.includes(payout.id))
+      await sdk.withdrawPayouts(filteredPayouts,
       () => {
         const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.id));  
         setPayouts(newState);
@@ -110,7 +121,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           <p className="title">Select rewards to withdraw</p>
         </div>
         <div className='col-6 text-right'>
-          <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={handleWithdrawals}>
+          <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={openModal}>
             Withdraw
           </button>
         </div>
@@ -141,6 +152,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           </tbody>
         </table>
       </div>
+      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBePaidIds={payoutsToBePaidIds} payouts={payouts} handleWithdrawals={handleWithdrawals} />
     </div>
   );
 };
