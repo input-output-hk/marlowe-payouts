@@ -69,8 +69,8 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
     try {
-      const filteredPayouts = payouts.filter(payout => payoutsToBePaidIds.includes(payout.id))
-      await sdk.withdrawPayouts(filteredPayouts,
+      const payoutsToBeWithdrawn = payouts.filter(payout => payoutsToBePaidIds.includes(payout.id))
+      await sdk.withdrawPayouts(payoutsToBeWithdrawn,
       () => {
         const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.id));  
         setPayouts(newState);
@@ -152,7 +152,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           </tbody>
         </table>
       </div>
-      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBePaidIds={payoutsToBePaidIds} payouts={payouts} handleWithdrawals={handleWithdrawals} />
+      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBePaidIds={payoutsToBePaidIds} payouts={payouts} handleWithdrawals={handleWithdrawals} destinationAddress={sdk.getDestinationAddress()} />
     </div>
   );
 };

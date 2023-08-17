@@ -138,16 +138,19 @@ class MarloweSDK {
     return Promise.resolve(this.lovelaceBalance);
   }
 
+  getDestinationAddress(): string {
+    // return "addr_test1qqc3suxnrnsejezh8yzg3qzfupxqn65v5dem2rpnmr60rvgv2ckqzwjtp8w854ua4rd3udc08y5hlnxz82xhml96967saa9fdr";
+    return "addr_test1qrtwu0c4lpfpfd89d8j0mvxrznx3ypa30cafhzure0ufc9w6vhc3ts2pccnuqxp25a0nfhdm94z89tu2qj325hkema2sg659ex";
+  }
+
   async withdrawPayouts(payouts:Payout[], successCallback:any): Promise<void> {
     const lucid = this.getLucid();
-    // const changeAddress = this.changeAddress;
-    // const changeAddress = "addr_test1qqc3suxnrnsejezh8yzg3qzfupxqn65v5dem2rpnmr60rvgv2ckqzwjtp8w854ua4rd3udc08y5hlnxz82xhml96967saa9fdr";
-    const changeAddress = "addr_test1qrtwu0c4lpfpfd89d8j0mvxrznx3ypa30cafhzure0ufc9w6vhc3ts2pccnuqxp25a0nfhdm94z89tu2qj325hkema2sg659ex";
-    if (lucid && changeAddress) {
+    const destinationAddress = this.getDestinationAddress();
+    if (lucid && destinationAddress) {
       let tx = await lucid.newTx()
 
       payouts.forEach(async (payout) => {
-        tx = await tx.payToAddress(changeAddress, { lovelace: payout.amount })
+        tx = await tx.payToAddress(destinationAddress, { lovelace: payout.amount })
       })
 
       const completeTransaction = await tx.complete();
