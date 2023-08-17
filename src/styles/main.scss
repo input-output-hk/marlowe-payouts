@@ -125,6 +125,25 @@ body {
     text-align: right !important;
   }
 
+.modal-dialog {
+  display: flex;
+  width: 24.3125rem;
+  padding: 2.0625rem 0rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.3125rem;
+  border-radius: 0.625rem;
+}
+
+.modal-title {
+  color: var(--button-contract-tab-default, #878FAA);
+  font-family: Outfit;
+  font-size: 1.625rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
 .modal-header, .modal-footer {
   border:none;
 }

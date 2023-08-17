@@ -24,17 +24,25 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title font-weight-bold">Confirm Withdrawal</h5>
-              <button type="button" className="close btn btn-outline-secondary" onClick={closeModal}>
-                <span aria-hidden="true">&times;</span>
-              </button>
+              <div className='container'>
+                <div className='row'>
+                  <div className='col-10 text-left'>
+                    <h5 className="modal-title">Confirm Withdrawal</h5>
+                  </div>
+                  <div className='col-2 text-right'>
+                    <button type="button" className="close btn btn-outline-secondary" onClick={closeModal}>
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="modal-body">
               <div className='container'>
                 <div className='row'>
                   <div className='col-12'>
                     <div className='container outer-modal-body'>
-                      <p className='font-weight-bold'>Summary of payouts to be paid:</p>
+                      <p className='font-weight-bold'>Reward name</p>
                       <div className='container inner-modal-body'>
                         <ul>
                           {payoutsToBePaid.map((payout, index) => (
@@ -44,12 +52,12 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                       </div>
                     </div>
                   </div>
-                  <div className='col-12'>
-                    <div className='divider'></div>
+                  <div className='col-12 my-3'>
+                    <hr className='mx-1'/>
                     <p className='transfer-title'>
                       Will transfer to
                     </p>
-                    <div className='divider'></div>
+                    <hr className='mx-1'/>
                   </div>
 
                   <div className='col-12'>
