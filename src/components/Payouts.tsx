@@ -12,9 +12,10 @@ type PayoutsProps = {
 const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   const changeAddress = sdk.changeAddress || '';
   const truncatedAddress = changeAddress.slice(0,18);
-  const payouts = sdk.getPayouts();
+  const sdkPayouts = sdk.getPayouts();
   const navigate = useNavigate();
   const [payoutsToBePaidIds, setPayoutsToBePaidIds] = useState<string[]>([]);
+  const [payouts, setPayouts] = useState<any[]>(sdkPayouts);
 
   useEffect(() => {
     const walletProvider = localStorage.getItem('walletProvider');
@@ -56,6 +57,27 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
     setPayoutsToBePaidIds(newState);
   }
 
+  const handleWithdrawals = async () => {
+    try {
+      await sdk.withdrawPayouts(payoutsToBePaidIds,
+      () => {
+        const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.id));  
+        setPayouts(newState);
+        setPayoutsToBePaidIds([]);
+        setAndShowToast(
+          'Payouts withdrawn',
+          <span>Successfully withdrew payouts.</span>
+        );
+      });
+    } catch (err) {
+      console.error('Failed to withdraw payouts: ', err);
+      setAndShowToast(
+        'Failed to withdraw payouts',
+        <span>Failed to withdraw payouts. Please try again.</span>
+      );
+    }
+  }
+
 
   return (
     <div className="container">
@@ -83,7 +105,16 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           </div>
         </div>
       </div>
-      <p className="title">Select rewards to withdraw</p>
+      <div className='row'>
+        <div className='col-6 text-left'>
+          <p className="title">Select rewards to withdraw</p>
+        </div>
+        <div className='col-6 text-right'>
+          <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={handleWithdrawals}>
+            Withdraw
+          </button>
+        </div>
+      </div>
       <div className="my-5">
         <table className="table">
           <thead>
@@ -91,7 +122,6 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
               <th scope="col">ID</th>
               <th scope="col">Name</th>
               <th scope="col">Amount</th>
-              <th scope="col">Action</th>
               <th scope="col">Bundle</th>
             </tr>
           </thead>
@@ -101,11 +131,6 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
                 <td>{payout.id}</td>
                 <td>{payout.name}</td>
                 <td>{payout.amount}</td>
-                <td>
-                  <button className="btn btn-outline-primary font-weight-bold" onClick={async () => await sdk.withdraw(payout.id)}>
-                    Withdraw
-                  </button>
-                </td>
                 <td>
                   <div className='form-check'>
                   <input type="checkbox" className='form-check-input' checked={payoutsToBePaidIds.includes(payout.id)} onChange={() => toggleBundleWithdrawal(payout.id)}/>

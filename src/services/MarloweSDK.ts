@@ -55,7 +55,27 @@ class MarloweSDK {
       [tokens2]
     );
 
-    const payouts = [payout1, payout2];
+    const payout3 = new Payout(
+      3,
+      "Payout3",
+      "/path/to/payout3-icon.jpg",
+      "RoleToken3",
+      "Withdraw",
+      [tokens2]
+    );
+
+
+    const payout4 = new Payout(
+      4,
+      "Payout4",
+      "/path/to/payout4-icon.jpg",
+      "RoleToken4",
+      "Withdraw",
+      [tokens2]
+    );
+
+
+    const payouts = [payout1, payout2, payout3, payout4];
 
     this.payouts = payouts;
 
@@ -114,27 +134,23 @@ class MarloweSDK {
     return Promise.resolve(this.lovelaceBalance);
   }
 
-  async withdraw(id:string): Promise<void> {
-    try {
-      const lucid = this.getLucid();
-      // const changeAddress = this.changeAddress;
-      const changeAddress = "addr_test1qqc3suxnrnsejezh8yzg3qzfupxqn65v5dem2rpnmr60rvgv2ckqzwjtp8w854ua4rd3udc08y5hlnxz82xhml96967saa9fdr";
-      if (lucid && changeAddress) {
-        console.log(`Withdrawing ${id}`);
-        console.log("LUCID FROM STATE: ", lucid);
-        console.log("CHANGE ADDRESS: ", changeAddress)
-        const tx = await lucid.newTx()
-          .payToAddress(changeAddress, { lovelace: 5000000n })
-          .payToAddress(changeAddress, { lovelace: 5000000n })
-          .complete();
+  async withdrawPayouts(payoutId:string[], successCallback:any): Promise<void> {
+    const lucid = this.getLucid();
+    // const changeAddress = this.changeAddress;
+    // const changeAddress = "addr_test1qqc3suxnrnsejezh8yzg3qzfupxqn65v5dem2rpnmr60rvgv2ckqzwjtp8w854ua4rd3udc08y5hlnxz82xhml96967saa9fdr";
+    const changeAddress = "addr_test1qrtwu0c4lpfpfd89d8j0mvxrznx3ypa30cafhzure0ufc9w6vhc3ts2pccnuqxp25a0nfhdm94z89tu2qj325hkema2sg659ex";
+    if (lucid && changeAddress) {
+      let tx = await lucid.newTx()
 
-        console.log("TX: ", tx);
-        const signedTx = await tx.sign().complete();
-        const txHash = await signedTx.submit();
-        console.log("TX HASH: ", txHash);
-      }
-    } catch (e) {
-      console.log("ERROR CREATING TX: ", e)
+      payoutId.forEach(async (id) => {
+        tx = await tx.payToAddress(changeAddress, { lovelace: 5000000n })
+      })
+
+      const completeTransaction = await tx.complete();
+
+      const signedTx = await completeTransaction.sign().complete();
+      const txHash = await signedTx.submit();
+      successCallback();
     }
   }
 }
