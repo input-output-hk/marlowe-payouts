@@ -1,6 +1,6 @@
 // Payouts.tsx
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
 
@@ -13,8 +13,8 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   const changeAddress = sdk.changeAddress || '';
   const truncatedAddress = changeAddress.slice(0,18);
   const payouts = sdk.getPayouts();
-
   const navigate = useNavigate();
+  const [payoutsToBePaidIds, setPayoutsToBePaidIds] = useState<string[]>([]);
 
   useEffect(() => {
     const walletProvider = localStorage.getItem('walletProvider');
@@ -43,6 +43,17 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
       <span>Please connect a wallet to see a list of available payouts.</span>
     );
     navigate('/');
+  }
+
+  const toggleBundleWithdrawal = (payoutId:string) => {
+    let newState = [...payoutsToBePaidIds];
+    if (newState.includes(payoutId)) {
+      newState = newState.filter(id => id !== payoutId);
+    } else {
+      newState = [...newState, payoutId];
+    }
+
+    setPayoutsToBePaidIds(newState);
   }
 
 
@@ -81,6 +92,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
               <th scope="col">Name</th>
               <th scope="col">Amount</th>
               <th scope="col">Action</th>
+              <th scope="col">Bundle</th>
             </tr>
           </thead>
           <tbody>
@@ -93,6 +105,11 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
                   <button className="btn btn-outline-primary font-weight-bold" onClick={async () => await sdk.withdraw(payout.id)}>
                     Withdraw
                   </button>
+                </td>
+                <td>
+                  <div className='form-check'>
+                  <input type="checkbox" className='form-check-input' checked={payoutsToBePaidIds.includes(payout.id)} onChange={() => toggleBundleWithdrawal(payout.id)}/>
+                  </div>
                 </td>
               </tr>
             ))}
