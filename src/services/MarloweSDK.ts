@@ -1,7 +1,8 @@
 import { Blockfrost, Lucid } from "lucid-cardano";
+import {RuntimeBrowser} from "@marlowe.tmp/legacy-runtime"
 import Token from "../models/Token";
 import Payout from "../models/Payout";
-
+import * as E from "fp-ts/Either"
 type Wallet = {
   enable: () => Promise<any>;
   getChangeAddress: () => Promise<string>;
@@ -113,6 +114,14 @@ class MarloweSDK {
           new Blockfrost("https://cardano-preview.blockfrost.io/api/v0", "previewGstJmKGkWEnJetz8heF9Gfs6q4FbOvc0"),
           "Preview",
         );
+        
+        const runtimeBrowser = await RuntimeBrowser.mkRuntimeCIP30(`http://localhost:4040`)(walletName)()
+        const result : E.Either<ErrorOptions,bigint> = await runtimeBrowser.wallet.getLovelaces()
+        E.match(
+          (err) => console.log("runtimeBrowser erro", err),
+          (lovelaceBalance) => console.log("runtimeBrowser", lovelaceBalance)
+        ) (result)
+        
         const wallet = await (window as any).cardano[walletName].enable();
         lucid.selectWallet(wallet);
         this.lucid = lucid;
