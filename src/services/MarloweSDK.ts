@@ -15,6 +15,8 @@ class MarloweSDK {
   changeAddress: string | null;
   payouts: any[];
   lucid: Lucid | null;
+  runtimeSettings: any;
+  runtimeBrowser: any;
 
   constructor() {
     this.validWalletNames = [
@@ -102,7 +104,7 @@ class MarloweSDK {
 
   async setChangeAddress(): Promise<void> {
     if (this.connectedWallet) {
-      this.changeAddress = await this.connectedWallet.getChangeAddress();
+      this.changeAddress = await this.runtimeBrowser.wallet.getChangeAddress();
     }
   }
 
@@ -115,12 +117,13 @@ class MarloweSDK {
           "Preview",
         );
         
-        const runtimeBrowser = await RuntimeBrowser.mkRuntimeCIP30(`http://localhost:4040`)(walletName)()
-        const result : E.Either<ErrorOptions,bigint> = await runtimeBrowser.wallet.getLovelaces()
+        this.runtimeBrowser = await RuntimeBrowser.mkRuntimeCIP30(`https://marlowe-runtime-preview-web.scdev.aws.iohkdev.io`)(walletName)()
+
+        // this.payouts = await this.runtimeBrowser.restAPI.withdrawals.getHeadersByRange();
         E.match(
           (err) => console.log("runtimeBrowser erro", err),
           (lovelaceBalance) => console.log("runtimeBrowser", lovelaceBalance)
-        ) (result)
+        ) (this.runtimeBrowser)
         
         const wallet = await (window as any).cardano[walletName].enable();
         lucid.selectWallet(wallet);
