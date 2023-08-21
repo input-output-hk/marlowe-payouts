@@ -70,9 +70,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
     try {
-      console.log("INSIDE HANDLE WITHDRAWALS")
       const payoutsToBeWithdrawn = payouts.filter(payout => payoutsToBePaidIds.includes(payout.payoutId))
-      console.log("PAYOUTS TO BE WITHDRAWN", payoutsToBeWithdrawn)
       await sdk.withdrawPayouts(payoutsToBeWithdrawn,
       () => {
         const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.payoutId));
@@ -145,7 +143,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
               <tr key={index}>
                 <td>{payout.payoutId}</td>
                 <td>{payout.contractId}</td>
-                <td>{payout.role.tokeName}</td>
+                <td>{payout.role.tokenName}</td>
                 <td>{payout.tokens.map((tk : Token) => tk.tokenName).join(", ")}</td>
                 <td>
                   <div className='form-check'>
