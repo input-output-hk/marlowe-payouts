@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MarloweSDK from '../services/MarloweSDK';
 import PayoutsModal from './PayoutsModal';
+import Token from '../models/Token';
 
 type PayoutsProps = {
   sdk: MarloweSDK,
@@ -69,10 +70,12 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
     try {
-      const payoutsToBeWithdrawn = payouts.filter(payout => payoutsToBePaidIds.includes(payout.id))
+      console.log("INSIDE HANDLE WITHDRAWALS")
+      const payoutsToBeWithdrawn = payouts.filter(payout => payoutsToBePaidIds.includes(payout.payoutId))
+      console.log("PAYOUTS TO BE WITHDRAWN", payoutsToBeWithdrawn)
       await sdk.withdrawPayouts(payoutsToBeWithdrawn,
       () => {
-        const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.id));  
+        const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.payoutId));
         setPayouts(newState);
         setPayoutsToBePaidIds([]);
         setAndShowToast(
@@ -131,20 +134,22 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           <thead>
             <tr>
               <th scope="col">ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Bundle</th>
+              <th scope="col">ContractId</th>
+              <th scope="col">Role Token</th>
+              <th scope="col">Tokens</th>
+              <th scope="col">Select For Payout</th>
             </tr>
           </thead>
           <tbody>
             {payouts.map((payout, index) => (
               <tr key={index}>
-                <td>{payout.id}</td>
-                <td>{payout.name}</td>
-                <td>{payout.amount}</td>
+                <td>{payout.payoutId}</td>
+                <td>{payout.contractId}</td>
+                <td>{payout.role.tokeName}</td>
+                <td>{payout.tokens.map((tk : Token) => tk.tokenName).join(", ")}</td>
                 <td>
                   <div className='form-check'>
-                  <input type="checkbox" className='form-check-input' checked={payoutsToBePaidIds.includes(payout.id)} onChange={() => toggleBundleWithdrawal(payout.id)}/>
+                  <input type="checkbox" className='form-check-input' checked={payoutsToBePaidIds.includes(payout.payoutId)} onChange={() => toggleBundleWithdrawal(payout.payoutId)}/>
                   </div>
                 </td>
               </tr>

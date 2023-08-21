@@ -1,10 +1,10 @@
 export default class Token {
-  id: number;
+  id: string;
   tokenName: string;
   currencySymbol: string;
-  amount: number;
+  amount: bigint;
 
-  constructor(id: number, tokenName: string, currencySymbol: string, amount: number) {
+  constructor(id: string, tokenName: string, currencySymbol: string, amount: bigint) {
     this.id = id;
     this.tokenName = tokenName;
     this.currencySymbol = currencySymbol;

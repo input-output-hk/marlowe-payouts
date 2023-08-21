@@ -1,10 +1,6 @@
 import React from 'react';
-
-interface Payout {
-  id: string;
-  name: string;
-  amount: number;
-}
+import Payout from '../models/Payout';
+import Token from '../models/Token';
 
 interface PayoutsModalProps {
   showModal: boolean;
@@ -15,9 +11,13 @@ interface PayoutsModalProps {
   handleWithdrawals: () => void;
 }
 
+const extractAmount = (payout: Payout) => {
+  return payout.tokens.map((token: Token) => token.amount).reduce((a, b) => a + b, 0n).toString();
+};
+
 const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBePaidIds, payouts, destinationAddress, handleWithdrawals }) => {
-  const payoutsToBePaid = payouts.filter(payout => payoutsToBePaidIds.includes(payout.id));
-  const samplePayout = payouts[0];
+  const payoutsToBePaid = payouts.filter(payout => payoutsToBePaidIds.includes(payout.payoutId));
+
   return (
     <>
       <div className={`modal ${showModal ? 'show' : ''}`} tabIndex={-1} style={{ display: showModal ? 'block' : 'none' }}>
@@ -46,7 +46,7 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                       <div className='container inner-modal-body'>
                         <ul>
                           {payoutsToBePaid.map((payout, index) => (
-                            <li key={index}>{payout.name}: {payout.amount.toString()} lovelace</li>
+                            <li key={index}>{payout.payoutId}: {extractAmount(payout)} lovelace</li>
                           ))}
                         </ul>
                       </div>

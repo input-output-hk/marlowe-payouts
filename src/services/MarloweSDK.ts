@@ -11,7 +11,7 @@ type Wallet = {
 class MarloweSDK {
   validWalletNames: string[];
   connectedWallet: Wallet | null;
-  lovelaceBalance: number;
+  lovelaceBalance: bigint;
   changeAddress: string | null;
   payouts: any[];
   lucid: Lucid | null;
@@ -28,59 +28,50 @@ class MarloweSDK {
       'lace',
     ];
     this.connectedWallet = null;
-    this.lovelaceBalance = 125000000;
+    this.lovelaceBalance = 125000000n;
     this.changeAddress = null;
     const tokens1 = [
-      new Token(1, "TokenA", "TA", 100),
-      new Token(2, "TokenB", "TB", 200)
+      new Token('1', "TokenA", "TA", 3000000n),
+      new Token('2', "TokenB", "TB", 2000000n)
     ];
 
     const tokens2 = [
-      new Token(3, "TokenC", "TC", 300),
-      new Token(4, "TokenD", "TD", 400)
+      new Token('3', "TokenC", "TC", 3000000n),
+      new Token('4', "TokenD", "TD", 2000000n),
     ];
 
+    const roleToken1 = new Token('5', "RoleToken1", "RT1", 1n)
+    const roleToken2 = new Token('6', "RoleToken2", "RT2", 1n)
+    const roleToken3 = new Token('7', "RoleToken2", "RT2", 1n)
+    const roleToken4 = new Token('8', "RoleToken2", "RT2", 1n)
+
     const payout1 = new Payout(
-      1,
-      "Payout1",
-      5000000n,
-      "/path/to/payout1-icon.jpg",
-      "RoleToken1",
-      "Withdraw",
-      [tokens1]
+      'payoutID1',
+      "contractID1",
+      roleToken1,
+      tokens1
     );
 
     const payout2 = new Payout(
-      2,
-      "Payout2",
-      3000000n,
-      "/path/to/payout2-icon.jpg",
-      "RoleToken2",
-      "Withdraw",
-      [tokens2]
+      "PayoutID2",
+      "contractID1",
+      roleToken2,
+      tokens2
     );
 
     const payout3 = new Payout(
-      3,
-      "Payout3",
-      23000000n,
-      "/path/to/payout3-icon.jpg",
-      "RoleToken3",
-      "Withdraw",
-      [tokens2]
+      "PayoutID3",
+      "contractID1",
+      roleToken3,
+      tokens2
     );
-
 
     const payout4 = new Payout(
-      4,
-      "Payout4",
-      97000000n,
-      "/path/to/payout4-icon.jpg",
-      "RoleToken4",
-      "Withdraw",
-      [tokens2]
+      "PayoutID4",
+      "contractID1",
+      roleToken4,
+      tokens2
     );
-
 
     const payouts = [payout1, payout2, payout3, payout4];
 
@@ -146,7 +137,7 @@ class MarloweSDK {
     this.connectedWallet = null;
   }
 
-  getLovelaceBalance(): Promise<number> {
+  getLovelaceBalance(): Promise<bigint> {
     return Promise.resolve(this.lovelaceBalance);
   }
 
@@ -162,7 +153,9 @@ class MarloweSDK {
       let tx = await lucid.newTx()
 
       payouts.forEach(async (payout) => {
-        tx = await tx.payToAddress(destinationAddress, { lovelace: payout.amount })
+        const amount = payout.tokens.map((token: Token) => token.amount).reduce((a, b) => a + b, 0n);
+        console.log("amount", amount);
+        tx = await tx.payToAddress(destinationAddress, { lovelace: amount })
       })
 
       const completeTransaction = await tx.complete();

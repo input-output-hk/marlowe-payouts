@@ -1,21 +1,15 @@
 import Token from "./Token";
 
 export default class Payout {
-  id: number;
-  name: string;
-  amount: bigint;
-  iconImage: string;
-  roleToken: string;
-  actionLabel: string;
-  tokens: Token[][];
+  payoutId: string;
+  contractId: string;
+  role: Token;
+  tokens: Token[]
 
-  constructor(id: number, name: string, amount: bigint, iconImage: string, roleToken: string, actionLabel: string, tokens: Token[][]) {
-    this.id = id;
-    this.name = name;
-    this.amount = amount;
-    this.iconImage = iconImage;
-    this.roleToken = roleToken;
-    this.actionLabel = actionLabel;
+  constructor(payoutId: string, contractId: string, role: Token, tokens: Token[]) {
+    this.payoutId = payoutId;
+    this.contractId = contractId;
+    this.role = role;
     this.tokens = tokens;
   }
 }
