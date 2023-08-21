@@ -147,7 +147,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
                 <td>{payout.tokens.map((tk : Token) => tk.tokenName).join(", ")}</td>
                 <td>
                   <div className='form-check form-switch'>
-                    <input type="checkbox" className='form-check-input' checked={payoutsToBePaidIds.includes(payout.payoutId)} onChange={() => toggleBundleWithdrawal(payout.payoutId)}/>
+                    <input type="checkbox" className='form-check-input mx-auto' checked={payoutsToBePaidIds.includes(payout.payoutId)} onChange={() => toggleBundleWithdrawal(payout.payoutId)}/>
                   </div>
                 </td>
               </tr>
