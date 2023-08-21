@@ -1,5 +1,5 @@
 import { Blockfrost, Lucid } from "lucid-cardano";
-import {RuntimeBrowser} from "@marlowe.tmp/legacy-runtime"
+import {RuntimeBrowser} from "@marlowe.io/runtime"
 import Token from "../models/Token";
 import Payout from "../models/Payout";
 import * as E from "fp-ts/Either"
@@ -108,9 +108,8 @@ class MarloweSDK {
           "Preview",
         );
         
-        this.runtimeBrowser = await RuntimeBrowser.mkRuntimeCIP30(`https://marlowe-runtime-preview-web.scdev.aws.iohkdev.io`)(walletName)()
+        this.runtimeBrowser = await RuntimeBrowser.mkRuntimeBroswer(`https://marlowe-runtime-preview-web.scdev.aws.iohkdev.io`)(walletName)()
 
-        // this.payouts = await this.runtimeBrowser.restAPI.withdrawals.getHeadersByRange();
         E.match(
           (err) => console.log("runtimeBrowser erro", err),
           (lovelaceBalance) => console.log("runtimeBrowser", lovelaceBalance)
