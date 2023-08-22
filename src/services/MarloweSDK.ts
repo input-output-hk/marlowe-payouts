@@ -1,5 +1,5 @@
 import { Blockfrost, Lucid } from "lucid-cardano";
-import { mkRuntimeBroswer } from "@marlowe.io/runtime/dist/instance/overRestAPI/browser/runtime"
+import { RuntimeBrowser } from "@marlowe.io/runtime"
 import Token from "../models/Token";
 import Payout from "../models/Payout";
 import * as E from "fp-ts/Either"
@@ -108,7 +108,7 @@ class MarloweSDK {
           "Preview",
         );
         
-        this.runtimeBrowser = await mkRuntimeBroswer(`https://marlowe-runtime-preview-web.scdev.aws.iohkdev.io`)(walletName)()
+        this.runtimeBrowser = await RuntimeBrowser.mkRuntimeBroswer(`https://marlowe-runtime-preview-web.scdev.aws.iohkdev.io`)(walletName)()
 
         E.match(
           (err) => console.log("runtimeBrowser erro", err),
