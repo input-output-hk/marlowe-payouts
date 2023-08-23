@@ -12,6 +12,7 @@ const ToastMessage: React.FC<ToastProps> = ({ title, message, show, onClose }) =
     <div className="toast-container position-fixed bottom-0 end-0 p-3">
       <div className={`toast ${show ? 'show' : ''}`} role="alert" aria-live="assertive" aria-atomic="true">
         <div className="toast-header">
+          <img src="images/marlowe-logo-only.svg" className="mr-2" alt="marlow-logo" style={{width: '20px', marginRight: '10px'}}/>
           <strong className="me-auto">{title}</strong>
           <button type="button" className="ml-2 mb-1 btn-close" data-bs-dismiss="toast" aria-label="Close" onClick={onClose}>
             <span aria-hidden="true">&times;</span>

@@ -66,6 +66,20 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
     }
 
     setPayoutsToBePaidIds(newState);
+
+    if (newState.length > 3) {
+      showTooManyPayoutsWarning();
+    }
+  }
+
+  const showTooManyPayoutsWarning = () => {
+      return setAndShowToast(
+        'Warning: Too many payouts selected',
+        <div>
+          <span>This payout bundle might be too big to go on chain.</span>
+          <span>Please consider breaking up your payouts into smaller bundles</span>
+        </div>
+      );
   }
 
   const handleWithdrawals = async () => {
@@ -102,7 +116,11 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
     if (allPayoutsSelected()) {
       setPayoutsToBePaidIds([]);
     } else {
-      setPayoutsToBePaidIds(allPayoutIds());
+      const payoutIds = allPayoutIds();
+      setPayoutsToBePaidIds(payoutIds);
+      if (payoutIds.length > 3) {
+        showTooManyPayoutsWarning();
+      }
     }
   }
 
