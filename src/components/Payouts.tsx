@@ -90,6 +90,15 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
     }
   }
 
+  function handleSelectAll() {
+    const allPayoutIds = payouts.map(payout => payout.payoutId);
+    if (payoutsToBePaidIds.length === allPayoutIds.length) {
+      setPayoutsToBePaidIds([]);
+    } else {
+      setPayoutsToBePaidIds(allPayoutIds);
+    }
+  }
+
 
   return (
     <div className="container">
@@ -111,7 +120,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
             <button className="btn btn-light btn-sm mr-2" title="Copy Address" onClick={copyToClipboard}>
               <img src="/images/content_copy.svg" alt="content-copy" />
             </button>
-            <button className="btn btn-light btn-sm" title="Show QR Code">
+            <button className="btn btn-light btn-sm d-none" title="Show QR Code">
               <img src="/images/qr_code_2.svg" alt="QR Code" />
             </button>
           </div>
@@ -122,6 +131,9 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
           <p className="title">Select rewards to withdraw</p>
         </div>
         <div className='col-6 text-right'>
+          <button className='btn btn-outline-primary' onClick={handleSelectAll}>
+            Select All
+          </button>
           <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={openModal}>
             Withdraw
           </button>

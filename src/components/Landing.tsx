@@ -80,7 +80,7 @@ const Landing: React.FC<LandingProps> = ({sdk, setAndShowToast}) => {
                     </div>
                   </div>
 
-                  <div className="row mt-4">
+                  <div className="row mt-4 d-none">
                     <div className="col-6 text-left p-0">
                       <a href="#" >Learn more</a>
                     </div>
