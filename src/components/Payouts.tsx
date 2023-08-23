@@ -90,12 +90,19 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
     }
   }
 
+  function allPayoutIds() {
+    return payouts.map(payout => payout.payoutId);
+  }
+
+  function allPayoutsSelected() {
+    return payoutsToBePaidIds.length === allPayoutIds().length;
+  }
+
   function handleSelectAll() {
-    const allPayoutIds = payouts.map(payout => payout.payoutId);
-    if (payoutsToBePaidIds.length === allPayoutIds.length) {
+    if (allPayoutsSelected()) {
       setPayoutsToBePaidIds([]);
     } else {
-      setPayoutsToBePaidIds(allPayoutIds);
+      setPayoutsToBePaidIds(allPayoutIds());
     }
   }
 
@@ -128,15 +135,16 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
       </div>
       <div className='row'>
         <div className='col-6 text-left'>
-          <p className="title">Select rewards to withdraw</p>
+            <p className="title">Select rewards to withdraw</p>
         </div>
-        <div className='col-6 text-right'>
-          <button className='btn btn-outline-primary' onClick={handleSelectAll}>
-            Select All
-          </button>
-          <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={openModal}>
-            Withdraw
-          </button>
+        <div className='col-6 d-flex justify-content-end align-items-center'>
+            <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
+                <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
+                <label className="form-check-label font-weight-bold">Select All</label>
+            </div>
+            <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={openModal}>
+                Withdraw
+            </button>
         </div>
       </div>
       <div className="my-5">
