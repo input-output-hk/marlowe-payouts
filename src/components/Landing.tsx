@@ -45,7 +45,7 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
                       <img src="/images/nami.svg" alt="Icon Before" className="icon" />
                       Nami Wallet
                       <div className="cardano-badge">
-                        <img src="https://s3-alpha-sig.figma.com/img/86d7/e924/af46237d72b394a9b4c58e515a1c641a?Expires=1693180800&Signature=R5iFCC-GCNGa6baiVaKxGpxwQCMsrPLQtwnLGS-mEkU2lMs644bSsrzO6d43jYX1J~PdeAjClhhlws9rZwZidkTMN7PjWQwcyOw8rh9CgXNvyL9doyZr9STpdgKvE8n1v4HU4vJ2Gk16cld9Wl~hTYIdOmkJfaBZHMyLldLoxoaYWL~YLwcgP9yO8e~9B76l7U0GLixGS3FOQ3--NvgVqzquOVsqCtO7lP8g7WE9NNjihAqRLQb6fUFQ8H6jEn0n61OcvMwiPkLoLuNS5rgMcehJWbAznbyBeDoalopgYUwlyJIC8Hl6Tvsf0sYJosCsJvkbtI3SEAxgSnFpnkiE0Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="Icon After" className="icon-after" />
+                        <img src="images/cardano_logo.png" alt="Icon After" className="icon-after" />
                         Cardano
                       </div>
                     </div>
@@ -55,7 +55,7 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
                       <img aria-hidden="true" src="https://lh3.googleusercontent.com/XjJJJR7nnCSk7L4ZF1B62j2BN-A571wvxW2Nadc43UBrvqiUZBqEfpOjZfgjggYwERErKLWSVSSauT44gXkD_i2tdrY=w128-h128-e365-rj-sc0x00ffffff" style={{ width: '30px', height: '30px' }} />
                       Eternl
                       <div className="cardano-badge">
-                        <img src="https://s3-alpha-sig.figma.com/img/86d7/e924/af46237d72b394a9b4c58e515a1c641a?Expires=1693180800&Signature=R5iFCC-GCNGa6baiVaKxGpxwQCMsrPLQtwnLGS-mEkU2lMs644bSsrzO6d43jYX1J~PdeAjClhhlws9rZwZidkTMN7PjWQwcyOw8rh9CgXNvyL9doyZr9STpdgKvE8n1v4HU4vJ2Gk16cld9Wl~hTYIdOmkJfaBZHMyLldLoxoaYWL~YLwcgP9yO8e~9B76l7U0GLixGS3FOQ3--NvgVqzquOVsqCtO7lP8g7WE9NNjihAqRLQb6fUFQ8H6jEn0n61OcvMwiPkLoLuNS5rgMcehJWbAznbyBeDoalopgYUwlyJIC8Hl6Tvsf0sYJosCsJvkbtI3SEAxgSnFpnkiE0Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4" alt="Icon After" className="icon-after" />
+                        <img src="images/cardano_logo.png" alt="Icon After" className="icon-after" />
                         Cardano
                       </div>
                     </div>
