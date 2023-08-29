@@ -1,37 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, {  } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MarloweSDK from '../services/MarloweSDK';
+
 
 type LandingProps = {
-  sdk: MarloweSDK;
   setAndShowToast: (title:string, message:any) => void
 };
 
-const Landing: React.FC<LandingProps> = ({sdk, setAndShowToast}) => {
+const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const walletProvider = localStorage.getItem('walletProvider');
-    if (walletProvider) {
-      try {
-        (async () => {
-          await sdk.connectWallet(walletProvider);
-          navigate('/payouts');
-        })();
-      } catch (e) {
-        console.log("USE EFFECT ON LANDNING PAGE FAILED: ", e)
-        localStorage.setItem('walletProvider', '');
-      }
-    }
-  }, [sdk, navigate]);
-
+  const selectedAWalletExtension = localStorage.getItem('walletProvider');
+  if (selectedAWalletExtension) {navigate('/payouts')}
 
   async function connectWallet(walletName:string) {
-    await sdk.connectWallet(walletName);
-    const connectedWallet = sdk.getConnectedWallet();
-    if (connectedWallet) {
-      localStorage.setItem('walletProvider', walletName);
-    }
+    localStorage.setItem('walletProvider', walletName);
     setAndShowToast(
       `Sucessfully connected ${walletName} wallet`,
       <span>You can now see a list of available payouts for your {walletName} wallet!</span>

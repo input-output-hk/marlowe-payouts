@@ -2,24 +2,38 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MarloweSDK from '../services/MarloweSDK';
 import PayoutsModal from './PayoutsModal';
-import Token from '../models/Token';
+// import Token from '../models/Token';
+import { Browser } from "@marlowe.io/runtime-lifecycle"
+import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/dist/apis/runtimeLifecycle"
+import { unAddressBech32,PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn } from "@marlowe.io/runtime-core"
+import * as O from 'fp-ts/lib/Option.js'
+import * as TE from "fp-ts/lib/TaskEither"
+import * as E from "fp-ts/lib/Either"
+import { pipe } from 'fp-ts/lib/function';
+
+import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
+
+const runtimeURL = `http://localhost:32943`
 
 type PayoutsProps = {
-  sdk: MarloweSDK,
   setAndShowToast: (title:string, message:any) => void
 };
 
-const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
-  const changeAddress = sdk.changeAddress || '';
-  const truncatedAddress = changeAddress.slice(0,18);
-  const sdkPayouts = sdk.getPayouts();
+const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const navigate = useNavigate();
-  const [payoutsToBePaidIds, setPayoutsToBePaidIds] = useState<string[]>([]);
-  const [payouts, setPayouts] = useState<any[]>(sdkPayouts);
+  const selectedAWalletExtension = localStorage.getItem('walletProvider');
+  if (!selectedAWalletExtension) {navigate('/');}
+  const [sdk, setSdk] = useState<RuntimeLifecycle>();
+  const [changeAddress,setChangeAddress] = useState<string>('')
+  const truncatedAddress = changeAddress.slice(0,11) + '....' + changeAddress.slice(102,108);
+  const [availablePayouts,setAvailablePayouts] = useState<PayoutAvailable[]>([])
+  const [withdrawnPayouts,setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
+  const [payoutIdsToBeWithdrawn, setPayoutIdsToBeWithdrawn] = useState<string[]>([]);
+  const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
+  const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
-
+   
   const openModal = () => {
     setShowModal(true);
   };
@@ -29,11 +43,26 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   };
 
   useEffect(() => {
-    const walletProvider = localStorage.getItem('walletProvider');
-    if (walletProvider && !changeAddress) {
-      navigate('/');
-    }
-  }, [changeAddress, navigate]);
+   
+    const fetchData = async () => {
+      if (!selectedAWalletExtension) {navigate('/');}
+      else {
+        const runtimeLifecycle =  await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
+        setSdk(runtimeLifecycle)
+        const newChangeAddress = await runtimeLifecycle.wallet.getChangeAddress()
+        setChangeAddress(unAddressBech32(newChangeAddress))
+        await pipe( runtimeLifecycle.payouts.available (O.none)
+                  ,TE.match(  
+                      (err) => console.log("Error", err),
+                      a => setAvailablePayouts(a)))()
+        await pipe( runtimeLifecycle.payouts.withdrawn (O.none)
+        ,TE.match(  
+            (err) => console.log("Error", err),
+            a => setWithdrawnPayouts(a)))()
+      }}
+    fetchData().catch(console.error)
+            
+  }, [selectedAWalletExtension,navigate]);
 
   const copyToClipboard = async () => {
     try {
@@ -48,8 +77,7 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   };
 
   const disconnectWallet = () => {
-    sdk.disconnectWallet();
-    localStorage.setItem('walletProvider', '');
+    localStorage.removeItem('walletProvider');
     setAndShowToast(
       'Disconnected wallet',
       <span>Please connect a wallet to see a list of available payouts.</span>
@@ -58,14 +86,14 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   }
 
   const toggleBundleWithdrawal = (payoutId:string) => {
-    let newState = [...payoutsToBePaidIds];
+    let newState = [...payoutIdsToBeWithdrawn];
     if (newState.includes(payoutId)) {
       newState = newState.filter(id => id !== payoutId);
     } else {
       newState = [...newState, payoutId];
     }
 
-    setPayoutsToBePaidIds(newState);
+    setPayoutIdsToBeWithdrawn(newState);
 
     if (newState.length > 3) {
       showTooManyPayoutsWarning();
@@ -83,41 +111,45 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
   }
 
   const handleWithdrawals = async () => {
-    try {
-      const payoutsToBeWithdrawn = payouts.filter(payout => payoutsToBePaidIds.includes(payout.payoutId))
-      await sdk.withdrawPayouts(payoutsToBeWithdrawn,
-      () => {
-        const newState = sdk.getPayouts().filter(payout => !payoutsToBePaidIds.includes(payout.payoutId));
-        setPayouts(newState);
-        setPayoutsToBePaidIds([]);
-        setAndShowToast(
-          'Payouts withdrawn',
-          <span>Successfully withdrew payouts.</span>
-        );
-      });
-    } catch (err) {
-      console.error('Failed to withdraw payouts: ', err);
-      setAndShowToast(
-        'Failed to withdraw payouts',
-        <span>Failed to withdraw payouts. Please try again.</span>
-      );
-    }
+      if (sdk) {
+        pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
+          , TE.chain (() => sdk.payouts.withdrawn (O.none))
+          , TE.map (newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts)})
+          , TE.chain (() => sdk.payouts.available (O.none))
+          , TE.map (newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
+          , TE.match(
+            (err) => {
+              console.error('Failed to withdraw payouts: ', err);
+              setAndShowToast(
+                'Failed to withdraw payouts',
+                <span>Failed to withdraw payouts. Please try again.</span>
+              )},
+            () => {
+              setPayoutIdsWithdrawnInProgress([])
+              setAndShowToast(
+                'Payouts withdrawn',
+                <span>Successfully withdrawn payouts.</span>
+              )}))()
+        setPayoutIdsToBeWithdrawn([])     
+        setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+      } 
   }
 
   function allPayoutIds() {
-    return payouts.map(payout => payout.payoutId);
+    return availablePayouts.map(payout => unPayoutId(payout.payoutId));
   }
 
   function allPayoutsSelected() {
-    return payoutsToBePaidIds.length === allPayoutIds().length;
+    return payoutIdsToBeWithdrawn.length === allPayoutIds().length;
   }
+
 
   function handleSelectAll() {
     if (allPayoutsSelected()) {
-      setPayoutsToBePaidIds([]);
+      setPayoutIdsToBeWithdrawn([]);
     } else {
       const payoutIds = allPayoutIds();
-      setPayoutsToBePaidIds(payoutIds);
+      setPayoutIdsToBeWithdrawn(payoutIds);
       if (payoutIds.length > 3) {
         showTooManyPayoutsWarning();
       }
@@ -153,14 +185,14 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
       </div>
       <div className='row'>
         <div className='col-6 text-left'>
-            <p className="title">Select rewards to withdraw</p>
+            <p className="title">Available Rewards</p>
         </div>
         <div className='col-6 d-flex justify-content-end align-items-center'>
             <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
                 <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
                 <label className="form-check-label font-weight-bold">Select All</label>
             </div>
-            <button className='btn btn-primary' disabled={!(payoutsToBePaidIds.length > 0)} onClick={openModal}>
+            <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0)} onClick={openModal}>
                 Withdraw
             </button>
         </div>
@@ -169,31 +201,64 @@ const Payouts: React.FC<PayoutsProps> = ({sdk, setAndShowToast}) => {
         <table className="table">
           <thead>
             <tr>
-              <th scope="col">ID</th>
               <th scope="col">ContractId</th>
               <th scope="col">Role Token</th>
-              <th scope="col">Tokens</th>
-              <th scope="col">Select For Payout</th>
+              <th scope="col">Rewards</th>
+              <th scope="col">Select to Withdraw</th>
             </tr>
           </thead>
           <tbody>
-            {payouts.map((payout, index) => (
+            {availablePayouts.map((payout, index) => (
               <tr key={index}>
-                <td>{payout.payoutId}</td>
-                <td>{payout.contractId}</td>
-                <td>{payout.role.tokenName}</td>
-                <td>{payout.tokens.map((tk : Token) => tk.tokenName).join(", ")}</td>
+                <td><a target="_blank" 
+                           rel="noopener noreferrer" 
+                           href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
+                           {shortViewTxOutRef(unContractId(payout.contractId))} </a>
+                  </td>
+                <td>{payout.role.assetName}</td>
+                <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
                 <td>
-                  <div className='form-check form-switch'>
-                    <input type="checkbox" className='form-check-input mx-auto' checked={payoutsToBePaidIds.includes(payout.payoutId)} onChange={() => toggleBundleWithdrawal(payout.payoutId)}/>
-                  </div>
+                  {payoutIdsWithdrawnInProgress.includes(unPayoutId(payout.payoutId))
+                    ? <div className='form-check form-switch'> withdrawn in progress </div> 
+                    : <div className='form-check form-switch'>
+                        <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
+                        </div> }
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBePaidIds={payoutsToBePaidIds} payouts={payouts} handleWithdrawals={handleWithdrawals} destinationAddress={sdk.getDestinationAddress()} />
+      <div className='row'>
+        <div className='col-6 text-left'>
+            <p className="title">Rewards Withdrawn</p>
+        </div>
+      </div>
+      <div className="my-5">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">ContractId</th>
+              <th scope="col">Role Token</th>
+              <th scope="col">Rewards</th>
+            </tr>
+          </thead>
+          <tbody>
+            {withdrawnPayouts.map((payout, index) => (
+              <tr key={index}>
+                <td><a target="_blank" 
+                           rel="noopener noreferrer" 
+                           href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
+                           {shortViewTxOutRef(unContractId(payout.contractId))} </a>
+                  </td>
+                <td>{payout.role.assetName}</td>
+                <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn}  handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
     </div>
   );
 };

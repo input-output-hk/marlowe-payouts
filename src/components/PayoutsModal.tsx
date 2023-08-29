@@ -1,23 +1,19 @@
 import React from 'react';
-import Payout from '../models/Payout';
-import Token from '../models/Token';
+
+import { PayoutAvailable } from '@marlowe.io/runtime-core';
+import { formatAssets, intersperse } from './Format';
 
 interface PayoutsModalProps {
   showModal: boolean;
   closeModal: () => void;
-  payoutsToBePaidIds: string[];
-  payouts: Payout[];
-  destinationAddress: string;
+  payoutsToBeWithdrawn: PayoutAvailable[];
+  changeAddress: string;
   handleWithdrawals: () => void;
 }
 
-const extractAmount = (payout: Payout) => {
-  return payout.tokens.map((token: Token) => token.amount).reduce((a, b) => a + b, 0n).toString();
-};
 
-const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBePaidIds, payouts, destinationAddress, handleWithdrawals }) => {
-  const payoutsToBePaid = payouts.filter(payout => payoutsToBePaidIds.includes(payout.payoutId));
-
+const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBeWithdrawn, changeAddress, handleWithdrawals }) => {
+ 
   return (
     <>
       <div className={`modal ${showModal ? 'show' : ''}`} tabIndex={-1} style={{ display: showModal ? 'block' : 'none' }}>
@@ -42,11 +38,11 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                 <div className='row'>
                   <div className='col-12'>
                     <div className='container outer-modal-body'>
-                      <p className='font-weight-bold'>Reward name</p>
+                      <p className='font-weight-bold'>Rewards</p>
                       <div className='container inner-modal-body'>
                         <ul>
-                          {payoutsToBePaid.map((payout, index) => (
-                            <li key={index}>{payout.payoutId}: {extractAmount(payout)} lovelace</li>
+                          {payoutsToBeWithdrawn.map((payout, index) => (
+                            <li key={index}>{[...intersperse ( formatAssets(payout.assets,false),',')]}</li>
                           ))}
                         </ul>
                       </div>
@@ -55,7 +51,7 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                   <div className='col-12 my-3'>
                     <hr className='mx-1'/>
                     <p className='transfer-title'>
-                      Will transfer to
+                      Will be transfered to
                     </p>
                     <hr className='mx-1'/>
                   </div>
@@ -63,7 +59,7 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                   <div className='col-12'>
                     <p className='destination-address-title'>Your wallet address</p>
                     <div className='container destination-address-container'>
-                      <p className='destination-address'>{destinationAddress}</p>
+                      <p className='destination-address'>{changeAddress}</p>
                     </div>
                   </div>
                 </div>
@@ -78,7 +74,7 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                     </button>
                   </div>
                   <div className='col'>
-                    <button type="button" className="btn btn-primary w-100" onClick={handleWithdrawals}>
+                    <button type="button" className="btn btn-primary w-100" onClick={x => {handleWithdrawals();closeModal()}}>
                       Confirm
                     </button>
                   </div>
