@@ -14,7 +14,7 @@ import { pipe } from 'fp-ts/lib/function';
 
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 
-const runtimeURL = `http://localhost:32943`
+const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
 type PayoutsProps = {
   setAndShowToast: (title:string, message:any) => void
@@ -33,7 +33,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
-   
+
   const openModal = () => {
     setShowModal(true);
   };
@@ -43,7 +43,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   };
 
   useEffect(() => {
-   
+
     const fetchData = async () => {
       if (!selectedAWalletExtension) {navigate('/');}
       else {
