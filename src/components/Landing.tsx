@@ -1,6 +1,13 @@
 import React, {  } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+declare global {
+  interface Window {
+    cardano: any;
+  }
+}
+
+
 
 type LandingProps = {
   setAndShowToast: (title:string, message:any) => void
@@ -9,6 +16,7 @@ type LandingProps = {
 const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
+  const validWalletExtentions = ['nami', 'eternl'];
   if (selectedAWalletExtension) {navigate('/payouts')}
 
   async function connectWallet(walletName:string) {
@@ -18,6 +26,33 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
       <span>You can now see a list of available payouts for your {walletName} wallet!</span>
     );
     navigate('/payouts');
+  }
+
+  function capitalizeFirstLetter(str: string): string {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function renderWallets(walletName:string) {
+    if (window.cardano && window.cardano[walletName]) {
+      return(<div className="row mt-2">
+        <div className="col-12 bordered-container" onClick={() => connectWallet(walletName)}>
+          <img src={window.cardano[walletName].icon} alt="Icon Before" className="icon" />
+          {capitalizeFirstLetter(walletName)} Wallet
+          <div className="cardano-badge">
+            <img src="images/cardano-logo.png" alt="Icon After" className="icon-after" />
+            Cardano
+          </div>
+        </div>
+      </div>)
+    } else {
+      return(
+        <div className="row mt-2">
+          <div className="col-12 bordered-container">
+            Please install {walletName} wallet extension to use app
+          </div>
+        </div>
+      )
+    }
   }
 
   return (
@@ -40,27 +75,7 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
                       <p className="card-help-text text-left">Please select a wallet to view rewards.</p>
                     </div>
                   </div>
-                  <div className="row mt-2">
-                    <div className="col-12 bordered-container" onClick={() => connectWallet("nami")}>
-                      <img src="/images/nami.svg" alt="Icon Before" className="icon" />
-                      Nami Wallet
-                      <div className="cardano-badge">
-                        <img src="images/cardano_logo.png" alt="Icon After" className="icon-after" />
-                        Cardano
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row mt-2">
-                    <div className="col-12 bordered-container" onClick={() => connectWallet("eternl")}>
-                      <img aria-hidden="true" src="https://lh3.googleusercontent.com/XjJJJR7nnCSk7L4ZF1B62j2BN-A571wvxW2Nadc43UBrvqiUZBqEfpOjZfgjggYwERErKLWSVSSauT44gXkD_i2tdrY=w128-h128-e365-rj-sc0x00ffffff" style={{ width: '30px', height: '30px' }} />
-                      Eternl
-                      <div className="cardano-badge">
-                        <img src="images/cardano_logo.png" alt="Icon After" className="icon-after" />
-                        Cardano
-                      </div>
-                    </div>
-                  </div>
-
+                  {validWalletExtentions.map((walletName) => renderWallets(walletName))}
                   <div className="row mt-4 d-none">
                     <div className="col-6 text-left p-0">
                       <a href="#" >Learn more</a>
