@@ -27,7 +27,6 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   if (!selectedAWalletExtension) {navigate('/');}
   const [sdk, setSdk] = useState<RuntimeLifecycle>();
   const [changeAddress,setChangeAddress] = useState<string>('')
-  const truncatedAddress = changeAddress.slice(0,11) + '....' + changeAddress.slice(102,108);
   const [availablePayouts,setAvailablePayouts] = useState<PayoutAvailable[]>([])
   const [withdrawnPayouts,setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
   const [payoutIdsToBeWithdrawn, setPayoutIdsToBeWithdrawn] = useState<string[]>([]);
@@ -36,6 +35,12 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);  
 
+  const truncateString = (str:string, start:number, end:number) => {
+    const length = str.length;
+    const lastLetterIndex = length - 1;
+    return str.slice(0,start) + '....' + str.slice(end,lastLetterIndex)
+  }
+  const truncatedAddress = truncateString(changeAddress,11,102)
 
   const openModal = () => {
     setShowModal(true);
@@ -225,11 +230,13 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
           <tbody>
             {availablePayouts.map((payout, index) => (
               <tr key={index}>
-                <td><a target="_blank" 
-                           rel="noopener noreferrer" 
-                           href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
-                           {shortViewTxOutRef(unContractId(payout.contractId))} </a>
-                  </td>
+                <td>
+                  <a target="_blank"
+                    rel="noopener noreferrer"
+                    href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                    {truncateString(unContractId(payout.contractId), 5, 60)}
+                  </a>
+                </td>
                 <td>{payout.role.assetName}</td>
                 <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
                 <td>
@@ -237,7 +244,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                     ? <Spinner size={7} />
                     : <div className='form-check form-switch'>
                         <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
-                        </div> }
+                      </div>
+                  }
                 </td>
               </tr>
             ))}
