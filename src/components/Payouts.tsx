@@ -106,7 +106,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
         'Warning: Too many payouts selected',
         <div>
           <span>This payout bundle might be too big to go on chain.</span>
-          <span>Please consider breaking up your payouts into smaller bundles</span>
+          <span> Please consider breaking up your payouts into smaller bundles.</span>
         </div>
       );
   }
