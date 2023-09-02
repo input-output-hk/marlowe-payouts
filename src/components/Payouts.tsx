@@ -78,6 +78,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
 
   const disconnectWallet = () => {
     localStorage.removeItem('walletProvider');
+    setChangeAddress('');
     setAndShowToast(
       'Disconnected wallet',
       <span>Please connect a wallet to see a list of available payouts.</span>
