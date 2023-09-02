@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PayoutsModal from './PayoutsModal';
-// import Token from '../models/Token';
 import { Browser } from "@marlowe.io/runtime-lifecycle"
 import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/dist/apis/runtimeLifecycle"
 import { unAddressBech32,PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn } from "@marlowe.io/runtime-core"
@@ -11,6 +10,7 @@ import * as O from 'fp-ts/lib/Option.js'
 import * as TE from "fp-ts/lib/TaskEither"
 import * as E from "fp-ts/lib/Either"
 import { pipe } from 'fp-ts/lib/function';
+import './Payouts.scss';
 
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 
