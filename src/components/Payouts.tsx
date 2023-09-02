@@ -13,6 +13,7 @@ import { pipe } from 'fp-ts/lib/function';
 import './Payouts.scss';
 
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
+import Spinner from './Spinner';
 
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
@@ -33,6 +34,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
+
 
   const openModal = () => {
     setShowModal(true);
@@ -116,7 +119,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
       if (sdk) {
-        pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
+        await setIsLoading(true)
+        await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
           , TE.chain (() => sdk.payouts.withdrawn (O.none))
           , TE.map (newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts)})
           , TE.chain (() => sdk.payouts.available (O.none))
@@ -136,8 +140,9 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                 <span className='text-color-white'>Successfully withdrawn payouts.</span>,
                 false
               )}))()
-        setPayoutIdsToBeWithdrawn([])     
-        setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+        await setPayoutIdsToBeWithdrawn([])
+        await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+        await setIsLoading(false)
       } 
   }
 
@@ -198,8 +203,12 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                 <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
                 <label className="form-check-label font-weight-bold">Select All</label>
             </div>
-            <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0)} onClick={openModal}>
-                Withdraw
+            <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0) || isLoading} onClick={openModal}>
+              {
+                isLoading ?
+                  'Processing...'
+                : 'Withdraw'
+              }
             </button>
         </div>
       </div>
@@ -224,8 +233,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                 <td>{payout.role.assetName}</td>
                 <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
                 <td>
-                  {payoutIdsWithdrawnInProgress.includes(unPayoutId(payout.payoutId))
-                    ? <div className='form-check form-switch'> withdrawn in progress </div> 
+                  {isLoading
+                    ? <Spinner size={7} />
                     : <div className='form-check form-switch'>
                         <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
                         </div> }

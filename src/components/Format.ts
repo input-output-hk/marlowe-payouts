@@ -14,7 +14,6 @@ export const formatAssets = (assets: Assets,isMainnnet : Boolean) : string[] => 
   const [adas,lovelaces,currency] = formatADAs (assets.lovelaces,isMainnnet)
   const formattedADA = lovelaces === '000000' ? adas + ' ' + currency : adas + '.' + lovelaces + ' ' + currency
   return [formattedADA].concat(assets.tokens.map((tk : Token) => `${tk.quantity} ${tk.assetId.assetName}`))
- 
 }
 
 export type CurrencyF = String 
