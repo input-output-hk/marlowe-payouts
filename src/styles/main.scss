@@ -2,6 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 $primary: #4B1FED;
+$warning: #E8740A;
+$danger: #FF515B;
+
 
 @import '~bootstrap/scss/bootstrap';
 
@@ -218,4 +221,8 @@ body {
 
 .form-check-input {
   font-size: 20px;
+}
+
+.text-color-white {
+  color: #fff;
 }

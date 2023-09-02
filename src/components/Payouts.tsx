@@ -17,7 +17,7 @@ import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
 type PayoutsProps = {
-  setAndShowToast: (title:string, message:any) => void
+  setAndShowToast: (title:string, message:any, isDanger:boolean) => void
 };
 
 const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
@@ -69,7 +69,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
       await navigator.clipboard.writeText(changeAddress);
       setAndShowToast(
         'Address copied to clipboard',
-        <span>Copied <span className="font-weight-bold">{changeAddress}</span> to clipboard</span>
+        <span className='text-color-white'>Copied <span className="font-weight-bold">{changeAddress}</span> to clipboard</span>,
+        false
       );
     } catch (err) {
       console.error('Failed to copy address: ', err);
@@ -81,7 +82,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
     setChangeAddress('');
     setAndShowToast(
       'Disconnected wallet',
-      <span>Please connect a wallet to see a list of available payouts.</span>
+      <span className='text-color-white'>Please connect a wallet to see a list of available payouts.</span>,
+      false
     );
     navigate('/');
   }
@@ -104,10 +106,11 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const showTooManyPayoutsWarning = () => {
       return setAndShowToast(
         'Warning: Too many payouts selected',
-        <div>
+        <div className='text-color-white'>
           <span>This payout bundle might be too big to go on chain.</span>
           <span> Please consider breaking up your payouts into smaller bundles.</span>
-        </div>
+        </div>,
+        true
       );
   }
 
@@ -123,13 +126,15 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
               console.error('Failed to withdraw payouts: ', err);
               setAndShowToast(
                 'Failed to withdraw payouts',
-                <span>Failed to withdraw payouts. Please try again.</span>
+                <span className='text-color-white'>Failed to withdraw payouts. Please try again.</span>,
+                true
               )},
             () => {
               setPayoutIdsWithdrawnInProgress([])
               setAndShowToast(
                 'Payouts withdrawn',
-                <span>Successfully withdrawn payouts.</span>
+                <span className='text-color-white'>Successfully withdrawn payouts.</span>,
+                false
               )}))()
         setPayoutIdsToBeWithdrawn([])     
         setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)

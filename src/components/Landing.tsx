@@ -10,7 +10,7 @@ declare global {
 
 
 type LandingProps = {
-  setAndShowToast: (title:string, message:any) => void
+  setAndShowToast: (title:string, message:any, isDanger:boolean) => void
 };
 
 const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
@@ -23,7 +23,8 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
     localStorage.setItem('walletProvider', walletName);
     setAndShowToast(
       `Sucessfully connected ${walletName} wallet`,
-      <span>You can now see a list of available payouts for your {walletName} wallet!</span>
+      <span className='text-color-white'>You can now see a list of available payouts for your {walletName} wallet!</span>,
+      false
     );
     navigate('/payouts');
   }

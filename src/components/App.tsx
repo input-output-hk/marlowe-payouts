@@ -11,8 +11,8 @@ const App: React.FC = () => {
   const hasSelectedAWalletExtension = localStorage.getItem('walletProvider');
   const [toasts, setToasts] = useState<any[]>([]);
 
-  const setAndShowToast = (title: string, message: React.ReactNode) => {
-    const newToast = { id: new Date().getTime(), title, message };
+  const setAndShowToast = (title: string, message: React.ReactNode, isDanger: boolean) => {
+    const newToast = { id: new Date().getTime(), title, message, isDanger };
     setToasts(prevToasts => [...prevToasts, newToast]);
   }
 
@@ -33,6 +33,7 @@ const App: React.FC = () => {
           id={toast.id}
           title={toast.title}
           message={toast.message}
+          isDanger={toast.isDanger}
           show={true}
           onClose={() => removeToast(toast.id)}
         />
