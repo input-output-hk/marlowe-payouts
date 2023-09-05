@@ -201,97 +201,112 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
           </div>
         </div>
       </div>
-      <div className='row'>
-        <div className='col-6 text-left'>
+      <ul className='nav nav-tabs'>
+        <li className='nav-item'>
+          <a className='nav-link active' href='#available-rewards' data-bs-toggle="tab">
             <p className="title">Available Rewards</p>
-        </div>
-        <div className='col-6 d-flex d-none justify-content-end align-items-center'>
-            <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
-                <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
-                <label className="form-check-label font-weight-bold">Select All</label>
-            </div>
-            <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0) || isLoading} onClick={openModal}>
-              {
-                isLoading ?
-                  'Processing...'
-                : 'Withdraw'
-              }
-            </button>
-        </div>
-      </div>
-      <div className="my-5">
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">ContractId</th>
-              <th scope="col">Role Token</th>
-              <th scope="col">Rewards</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {availablePayouts.map((payout, index) => (
-              <tr key={index}>
-                <td>
-                  <a target="_blank"
-                    rel="noopener noreferrer"
-                    href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
-                    {truncateString(unContractId(payout.contractId), 5, 60)}
-                  </a>
-                </td>
-                <td>{payout.role.assetName}</td>
-                <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
-                <td>
-                  {isLoading
-                    ? <Spinner size={7} />
-                    : 
-                      // <div className='form-check form-switch'>
-                      //   <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
-                      // </div>
-                      <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                        {
-                          isLoading ?
-                            'Processing...'
-                          : 'Withdraw'
-                        }
-                      </button>
-          
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className='row'>
-        <div className='col-6 text-left'>
+          </a>
+        </li>
+        <li className='nav-item'>
+          <a className='nav-link' href='#rewards-withdrawn' data-bs-toggle="tab">
             <p className="title">Rewards Withdrawn</p>
+          </a>
+        </li>
+      </ul>
+
+      <div className='tab-conent'>
+        <div className='tab-pane fade show active' id='available-rewards' role='tabpanel' aria-labelledby='available-rewards-tab'>
+          <div className='row'>
+            <div className='col-6 text-left'>
+            </div>
+            <div className='col-6 d-flex d-none justify-content-end align-items-center'>
+                <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
+                    <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
+                    <label className="form-check-label font-weight-bold">Select All</label>
+                </div>
+                <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0) || isLoading} onClick={openModal}>
+                  {
+                    isLoading ?
+                      'Processing...'
+                    : 'Withdraw'
+                  }
+                </button>
+            </div>
+          </div>
+          <div className="my-5">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">ContractId</th>
+                  <th scope="col">Role Token</th>
+                  <th scope="col">Rewards</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {availablePayouts.map((payout, index) => (
+                  <tr key={index}>
+                    <td>
+                      <a target="_blank"
+                        rel="noopener noreferrer"
+                        href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                        {truncateString(unContractId(payout.contractId), 5, 60)}
+                      </a>
+                    </td>
+                    <td>{payout.role.assetName}</td>
+                    <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                    <td>
+                      {isLoading
+                        ? <Spinner size={7} />
+                        : 
+                          // <div className='form-check form-switch'>
+                          //   <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
+                          // </div>
+                          <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                            {
+                              isLoading ?
+                                'Processing...'
+                              : 'Withdraw'
+                            }
+                          </button>
+              
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className='tab-pane fade' id='rewards-withdrawn' role='tabpanel' aria-labelledby='rewards-withdrawn-tab'>
+          <div className="my-5">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">ContractId</th>
+                  <th scope="col">Role Token</th>
+                  <th scope="col">Rewards</th>
+                </tr>
+              </thead>
+              <tbody>
+                {withdrawnPayouts.map((payout, index) => (
+                  <tr key={index}>
+                    <td><a target="_blank" 
+                              rel="noopener noreferrer" 
+                              href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
+                              {shortViewTxOutRef(unContractId(payout.contractId))} </a>
+                      </td>
+                    <td>{payout.role.assetName}</td>
+                    <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div className="my-5">
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">ContractId</th>
-              <th scope="col">Role Token</th>
-              <th scope="col">Rewards</th>
-            </tr>
-          </thead>
-          <tbody>
-            {withdrawnPayouts.map((payout, index) => (
-              <tr key={index}>
-                <td><a target="_blank" 
-                           rel="noopener noreferrer" 
-                           href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
-                           {shortViewTxOutRef(unContractId(payout.contractId))} </a>
-                  </td>
-                <td>{payout.role.assetName}</td>
-                <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+
       <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn}  handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
     </div>
   );

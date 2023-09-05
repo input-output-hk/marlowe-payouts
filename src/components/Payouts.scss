@@ -14,3 +14,11 @@
   background: #F8F6FF;
   border: none;
 }
+
+.nav-link.active {
+  p {color: black;}
+}
+
+.nav-link p {
+  color: #5A5A5A;
+}
