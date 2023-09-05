@@ -109,6 +109,8 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
     if (newState.length > 3) {
       showTooManyPayoutsWarning();
     }
+
+    openModal();
   }
 
   const showTooManyPayoutsWarning = () => {
@@ -203,7 +205,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
         <div className='col-6 text-left'>
             <p className="title">Available Rewards</p>
         </div>
-        <div className='col-6 d-flex justify-content-end align-items-center'>
+        <div className='col-6 d-flex d-none justify-content-end align-items-center'>
             <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
                 <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
                 <label className="form-check-label font-weight-bold">Select All</label>
@@ -224,7 +226,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
               <th scope="col">ContractId</th>
               <th scope="col">Role Token</th>
               <th scope="col">Rewards</th>
-              <th scope="col">Select to Withdraw</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -242,9 +244,18 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                 <td>
                   {isLoading
                     ? <Spinner size={7} />
-                    : <div className='form-check form-switch'>
-                        <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
-                      </div>
+                    : 
+                      // <div className='form-check form-switch'>
+                      //   <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
+                      // </div>
+                      <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                        {
+                          isLoading ?
+                            'Processing...'
+                          : 'Withdraw'
+                        }
+                      </button>
+          
                   }
                 </td>
               </tr>
