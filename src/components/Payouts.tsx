@@ -47,6 +47,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   };
 
   const closeModal = () => {
+    setPayoutIdsToBeWithdrawn([]);
     setShowModal(false);
   };
 
@@ -134,10 +135,17 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
           , TE.map (newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
           , TE.match(
             (err) => {
-              console.error('Failed to withdraw payouts: ', err);
+              const response = err.request.response;
+              const error = JSON.parse(response);
+              const {message} = error;
+              console.error('Failed to withdraw payouts: ', error);
               setAndShowToast(
                 'Failed to withdraw payouts',
-                <span className='text-color-white'>Failed to withdraw payouts. Please try again.</span>,
+                <div>
+                  <p className='text-color-white'>Message from Server: </p>
+                  <p className='text-color-white'>{message}</p>
+                </div>
+                ,
                 true
               )},
             () => {
@@ -305,7 +313,6 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
           </div>
         </div>
       </div>
-
 
       <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn}  handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
     </div>
