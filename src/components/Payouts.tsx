@@ -54,7 +54,6 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   };
 
   const closeModal = () => {
-    setPayoutIdsToBeWithdrawn([]);
     setShowModal(false);
   };
 
@@ -105,6 +104,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   }
 
   const toggleBundleWithdrawal = (payoutId:string) => {
+    setIsLoading(true);
     let newState = [...payoutIdsToBeWithdrawn];
     if (newState.includes(payoutId)) {
       newState = newState.filter(id => id !== payoutId);
@@ -162,10 +162,14 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
               <span className='text-color-white'>Successfully withdrawn payouts.</span>,
               false
             )}))()
-      await setPayoutIdsToBeWithdrawn([])
       await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
       await setIsLoading(false)
+      await setPayoutIdsToBeWithdrawn([])
     } 
+  }
+
+  const payoutSelectedToBeWithdrawn = (payoutId:string) => {
+    return payoutIdsToBeWithdrawn.includes(payoutId);
   }
 
   return (
@@ -236,17 +240,12 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                           <td>{payout.role.assetName}</td>
                           <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
                           <td>
-                            {isLoading
-                              ? <Spinner size={7} />
-                              : <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                                  {
-                                    isLoading ?
-                                      'Processing...'
-                                    : 'Withdraw'
-                                  }
-                                </button>
-                    
-                            }
+                                {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
+                                ? <Spinner size={7} /> :
+                                  <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                                    Withdraw
+                                  </button>
+                                }
                           </td>
                         </tr>
                       ))}
