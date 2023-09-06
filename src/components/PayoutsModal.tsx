@@ -13,7 +13,7 @@ interface PayoutsModalProps {
 
 
 const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBeWithdrawn, changeAddress, handleWithdrawals }) => {
- 
+
   return (
     <>
       <div className={`modal ${showModal ? 'show' : ''}`} tabIndex={-1} style={{ display: showModal ? 'block' : 'none' }}>
@@ -39,12 +39,10 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                   <div className='col-12'>
                     <div className='container outer-modal-body'>
                       <p className='font-weight-bold'>Rewards</p>
-                      <div className='container inner-modal-body'>
-                        <ul>
+                      <div className='container'>
                           {payoutsToBeWithdrawn.map((payout, index) => (
-                            <li key={index}>{[...intersperse ( formatAssets(payout.assets,false),',')]}</li>
+                            <p className='font-weight-bold' key={index}>{[...intersperse ( formatAssets(payout.assets,false),',')]}</p>
                           ))}
-                        </ul>
                       </div>
                     </div>
                   </div>
