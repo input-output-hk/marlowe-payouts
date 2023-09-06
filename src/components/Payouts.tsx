@@ -221,25 +221,31 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th scope="col">ContractId</th>
-                        <th scope="col">Role Token</th>
-                        <th scope="col">Rewards</th>
-                        <th scope="col">Actions</th>
+                        <th className="pt-3" scope="col"><img src="images/fingerprint.svg" alt="Name Logo" className="header-logo" /></th>
+                        <th className="pt-3" scope="col"><img src="images/cycle.svg" alt="Next Vest Date Logo" className="header-logo" /></th>
+                        <th className="pt-3" scope="col"><img src="images/nature.svg" alt="Vested Logo" className="header-logo" /></th>
+                        <th className="pt-3" scope="col"><img src="images/check_circle.svg" alt="Actions Logo" className="header-logo" /></th>
+                      </tr>
+                      <tr>
+                        <th className="pb-3" scope="col">ContractId</th>
+                        <th className="pb-3" scope="col">Role Token</th>
+                        <th className="pb-3" scope="col">Rewards</th>
+                        <th className="pb-3" scope="col">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {availablePayouts.map((payout, index) => (
                         <tr key={index}>
-                          <td>
+                          <td className='py-3'>
                             <a target="_blank"
                               rel="noopener noreferrer"
                               href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
                               {truncateString(unContractId(payout.contractId), 5, 60)}
                             </a>
                           </td>
-                          <td>{payout.role.assetName}</td>
-                          <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
-                          <td>
+                          <td className='py-3'>{payout.role.assetName}</td>
+                          <td className='py-3'>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                          <td className='py-3'>
                                 {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
                                 ? <Spinner size={7} /> :
                                   <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
@@ -267,21 +273,26 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th scope="col">ContractId</th>
-                        <th scope="col">Role Token</th>
-                        <th scope="col">Rewards</th>
+                        <th className="pt-3" scope="col"><img src="images/fingerprint.svg" alt="Name Logo" className="header-logo" /></th>
+                        <th className="pt-3" scope="col"><img src="images/cycle.svg" alt="Next Vest Date Logo" className="header-logo" /></th>
+                        <th className="pt-3" scope="col"><img src="images/nature.svg" alt="Vested Logo" className="header-logo" /></th>
+                      </tr>
+                      <tr>
+                        <th className="pb-3" scope="col">ContractId</th>
+                        <th className="pb-3" scope="col">Role Token</th>
+                        <th className="pb-3" scope="col">Rewards</th>
                       </tr>
                     </thead>
                     <tbody>
                       {withdrawnPayouts.map((payout, index) => (
                         <tr key={index}>
-                          <td><a target="_blank" 
+                          <td className='py-3'><a target="_blank" 
                                     rel="noopener noreferrer" 
                                     href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
                                     {shortViewTxOutRef(unContractId(payout.contractId))} </a>
                             </td>
-                          <td>{payout.role.assetName}</td>
-                          <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                          <td className='py-3'>{payout.role.assetName}</td>
+                          <td className='py-3'>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
                         </tr>
                       ))}
                     </tbody>
