@@ -33,7 +33,14 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstTabContentClassNames, setFirstTabContentClassNames] = useState('tab-pane fade show active');
+  const [secondTabContentClassNames, setSecondTabContentClassNames] = useState('tab-pane fade d-none');
+
+  const toggleTabContentClassNames = () => { 
+    setFirstTabContentClassNames(firstTabContentClassNames === 'tab-pane fade show active' ? 'tab-pane fade d-none' : 'tab-pane fade show active');
+    setSecondTabContentClassNames(secondTabContentClassNames === 'tab-pane fade d-none' ? 'tab-pane fade show active' : 'tab-pane fade d-none');
+  }
 
   const truncateString = (str:string, start:number, end:number) => {
     const length = str.length;
@@ -51,27 +58,27 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
     setShowModal(false);
   };
 
-  useEffect(() => {
+  const fetchData = async () => {
+    if (!selectedAWalletExtension) {navigate('/');}
+    else {
+      const runtimeLifecycle =  await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
+      setSdk(runtimeLifecycle)
+      const newChangeAddress = await runtimeLifecycle.wallet.getChangeAddress()
+      setChangeAddress(unAddressBech32(newChangeAddress))
+      await pipe( runtimeLifecycle.payouts.available (O.none)
+                ,TE.match(  
+                    (err) => console.log("Error", err),
+                    a => setAvailablePayouts(a)))()
+      await pipe( runtimeLifecycle.payouts.withdrawn (O.none)
+      ,TE.match(  
+          (err) => console.log("Error", err),
+          a => setWithdrawnPayouts(a)))()
+    }
+  }
 
-    const fetchData = async () => {
-      if (!selectedAWalletExtension) {navigate('/');}
-      else {
-        const runtimeLifecycle =  await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
-        setSdk(runtimeLifecycle)
-        const newChangeAddress = await runtimeLifecycle.wallet.getChangeAddress()
-        setChangeAddress(unAddressBech32(newChangeAddress))
-        await pipe( runtimeLifecycle.payouts.available (O.none)
-                  ,TE.match(  
-                      (err) => console.log("Error", err),
-                      a => setAvailablePayouts(a)))()
-        await pipe( runtimeLifecycle.payouts.withdrawn (O.none)
-        ,TE.match(  
-            (err) => console.log("Error", err),
-            a => setWithdrawnPayouts(a)))()
-      }}
+  useEffect(() => {
     fetchData().catch(console.error)
-            
-  }, [selectedAWalletExtension,navigate]);
+  }, [selectedAWalletExtension, navigate]);
 
   const copyToClipboard = async () => {
     try {
@@ -115,73 +122,51 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   }
 
   const showTooManyPayoutsWarning = () => {
-      return setAndShowToast(
-        'Warning: Too many payouts selected',
-        <div className='text-color-white'>
-          <span>This payout bundle might be too big to go on chain.</span>
-          <span> Please consider breaking up your payouts into smaller bundles.</span>
-        </div>,
-        true
-      );
+    return setAndShowToast(
+      'Warning: Too many payouts selected',
+      <div className='text-color-white'>
+        <span>This payout bundle might be too big to go on chain.</span>
+        <span> Please consider breaking up your payouts into smaller bundles.</span>
+      </div>,
+      true
+    );
   }
 
   const handleWithdrawals = async () => {
-      if (sdk) {
-        await setIsLoading(true)
-        await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
-          , TE.chain (() => sdk.payouts.withdrawn (O.none))
-          , TE.map (newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts)})
-          , TE.chain (() => sdk.payouts.available (O.none))
-          , TE.map (newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
-          , TE.match(
-            (err) => {
-              const response = err.request.response;
-              const error = JSON.parse(response);
-              const {message} = error;
-              console.error('Failed to withdraw payouts: ', error);
-              setAndShowToast(
-                'Failed to withdraw payouts',
-                <div>
-                  <p className='text-color-white'>Message from Server: </p>
-                  <p className='text-color-white'>{message}</p>
-                </div>
-                ,
-                true
-              )},
-            () => {
-              setPayoutIdsWithdrawnInProgress([])
-              setAndShowToast(
-                'Payouts withdrawn',
-                <span className='text-color-white'>Successfully withdrawn payouts.</span>,
-                false
-              )}))()
-        await setPayoutIdsToBeWithdrawn([])
-        await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-        await setIsLoading(false)
-      } 
+    if (sdk) {
+      await setIsLoading(true)
+      await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
+        , TE.chain (() => sdk.payouts.withdrawn (O.none))
+        , TE.map (newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts)})
+        , TE.chain (() => sdk.payouts.available (O.none))
+        , TE.map (newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
+        , TE.match(
+          (err) => {
+            const response = err.request.response;
+            const error = JSON.parse(response);
+            const {message} = error;
+            console.error('Failed to withdraw payouts: ', error);
+            setAndShowToast(
+              'Failed to withdraw payouts',
+              <div>
+                <p className='text-color-white'>Message from Server: </p>
+                <p className='text-color-white'>{message}</p>
+              </div>
+              ,
+              true
+            )},
+          () => {
+            setPayoutIdsWithdrawnInProgress([])
+            setAndShowToast(
+              'Payouts withdrawn',
+              <span className='text-color-white'>Successfully withdrawn payouts.</span>,
+              false
+            )}))()
+      await setPayoutIdsToBeWithdrawn([])
+      await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+      await setIsLoading(false)
+    } 
   }
-
-  function allPayoutIds() {
-    return availablePayouts.map(payout => unPayoutId(payout.payoutId));
-  }
-
-  function allPayoutsSelected() {
-    return payoutIdsToBeWithdrawn.length === allPayoutIds().length;
-  }
-
-
-  function handleSelectAll() {
-    if (allPayoutsSelected()) {
-      setPayoutIdsToBeWithdrawn([]);
-    } else {
-      const payoutIds = allPayoutIds();
-      setPayoutIdsToBeWithdrawn(payoutIds);
-      if (payoutIds.length > 3) {
-        showTooManyPayoutsWarning();
-      }
-    }
-  }
-
 
   return (
     <div className="container">
@@ -211,105 +196,100 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
       </div>
       <ul className='nav nav-tabs'>
         <li className='nav-item'>
-          <a className='nav-link active' href='#available-rewards' data-bs-toggle="tab">
+          <a className='nav-link active' href='#available-rewards' data-bs-toggle="tab" onClick={toggleTabContentClassNames}>
             <p className="title">Available Rewards</p>
           </a>
         </li>
         <li className='nav-item'>
-          <a className='nav-link' href='#rewards-withdrawn' data-bs-toggle="tab">
+          <a className='nav-link' href='#rewards-withdrawn' data-bs-toggle="tab" onClick={toggleTabContentClassNames}>
             <p className="title">Rewards Withdrawn</p>
           </a>
         </li>
       </ul>
 
       <div className='tab-conent'>
-        <div className='tab-pane fade show active' id='available-rewards' role='tabpanel' aria-labelledby='available-rewards-tab'>
-          <div className='row'>
-            <div className='col-6 text-left'>
-            </div>
-            <div className='col-6 d-flex d-none justify-content-end align-items-center'>
-                <div className='form-check form-switch d-flex align-items-center' style={{ marginRight: '30px' }}>
-                    <input type="checkbox" className='form-check-input font-weight-bold' style={{ marginRight: '10px' }} checked={allPayoutsSelected()} onChange={handleSelectAll}/>
-                    <label className="form-check-label font-weight-bold">Select All</label>
-                </div>
-                <button className='btn btn-primary' disabled={!(payoutIdsToBeWithdrawn.length > 0) || isLoading} onClick={openModal}>
-                  {
-                    isLoading ?
-                      'Processing...'
-                    : 'Withdraw'
-                  }
-                </button>
-            </div>
-          </div>
-          <div className="my-5">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">ContractId</th>
-                  <th scope="col">Role Token</th>
-                  <th scope="col">Rewards</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {availablePayouts.map((payout, index) => (
-                  <tr key={index}>
-                    <td>
-                      <a target="_blank"
-                        rel="noopener noreferrer"
-                        href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
-                        {truncateString(unContractId(payout.contractId), 5, 60)}
-                      </a>
-                    </td>
-                    <td>{payout.role.assetName}</td>
-                    <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
-                    <td>
-                      {isLoading
-                        ? <Spinner size={7} />
-                        : 
-                          // <div className='form-check form-switch'>
-                          //   <input type="checkbox" className='form-check-input mx-auto' checked={payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId))} onChange={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}/>
-                          // </div>
-                          <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                            {
-                              isLoading ?
-                                'Processing...'
-                              : 'Withdraw'
+        {/* First Tab Content */}
+        <div className={firstTabContentClassNames} id='available-rewards' role='tabpanel' aria-labelledby='available-rewards-tab'>
+          <div className='container'>
+            <div className='row'>
+              <div className='col-12'>
+                <div className="my-5">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">ContractId</th>
+                        <th scope="col">Role Token</th>
+                        <th scope="col">Rewards</th>
+                        <th scope="col">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {availablePayouts.map((payout, index) => (
+                        <tr key={index}>
+                          <td>
+                            <a target="_blank"
+                              rel="noopener noreferrer"
+                              href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                              {truncateString(unContractId(payout.contractId), 5, 60)}
+                            </a>
+                          </td>
+                          <td>{payout.role.assetName}</td>
+                          <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                          <td>
+                            {isLoading
+                              ? <Spinner size={7} />
+                              : <button className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                                  {
+                                    isLoading ?
+                                      'Processing...'
+                                    : 'Withdraw'
+                                  }
+                                </button>
+                    
                             }
-                          </button>
-              
-                      }
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className='tab-pane fade' id='rewards-withdrawn' role='tabpanel' aria-labelledby='rewards-withdrawn-tab'>
-          <div className="my-5">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">ContractId</th>
-                  <th scope="col">Role Token</th>
-                  <th scope="col">Rewards</th>
-                </tr>
-              </thead>
-              <tbody>
-                {withdrawnPayouts.map((payout, index) => (
-                  <tr key={index}>
-                    <td><a target="_blank" 
-                              rel="noopener noreferrer" 
-                              href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
-                              {shortViewTxOutRef(unContractId(payout.contractId))} </a>
-                      </td>
-                    <td>{payout.role.assetName}</td>
-                    <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+        {/* Second Tab Content */}
+        <div className={secondTabContentClassNames} id='rewards-withdrawn' role='tabpanel' aria-labelledby='rewards-withdrawn-tab'>
+          <div className='container'>
+            <div className='row'>
+              <div className='col-12'>
+
+                <div className="my-5">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">ContractId</th>
+                        <th scope="col">Role Token</th>
+                        <th scope="col">Rewards</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {withdrawnPayouts.map((payout, index) => (
+                        <tr key={index}>
+                          <td><a target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
+                                    {shortViewTxOutRef(unContractId(payout.contractId))} </a>
+                            </td>
+                          <td>{payout.role.assetName}</td>
+                          <td>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
