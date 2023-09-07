@@ -11,9 +11,7 @@ interface PayoutsModalProps {
   handleWithdrawals: () => void;
 }
 
-
 const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBeWithdrawn, changeAddress, handleWithdrawals }) => {
-
   return (
     <>
       <div className={`modal ${showModal ? 'show' : ''}`} tabIndex={-1} style={{ display: showModal ? 'block' : 'none' }}>
@@ -40,18 +38,18 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                     <div className='container outer-modal-body'>
                       <p className='font-weight-bold'>Rewards</p>
                       <div className='container'>
-                          {payoutsToBeWithdrawn.map((payout, index) => (
-                            <p className='font-weight-bold' key={index}>{[...intersperse ( formatAssets(payout.assets,false),',')]}</p>
-                          ))}
+                        {payoutsToBeWithdrawn.map((payout, index) => (
+                          <p className='font-weight-bold' key={index}>{[...intersperse(formatAssets(payout.assets, false), ',')]}</p>
+                        ))}
                       </div>
                     </div>
                   </div>
                   <div className='col-12 my-3'>
-                    <hr className='mx-1'/>
+                    <hr className='mx-1' />
                     <p className='transfer-title'>
                       Will be transfered to
                     </p>
-                    <hr className='mx-1'/>
+                    <hr className='mx-1' />
                   </div>
 
                   <div className='col-12'>
@@ -72,7 +70,7 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                     </button>
                   </div>
                   <div className='col'>
-                    <button type="button" className="btn btn-primary w-100" onClick={x => {handleWithdrawals();closeModal()}}>
+                    <button type="button" className="btn btn-primary w-100" onClick={x => { handleWithdrawals(); closeModal() }}>
                       Confirm
                     </button>
                   </div>

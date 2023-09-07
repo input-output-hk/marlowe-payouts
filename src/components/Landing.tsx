@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React, { } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 declare global {
@@ -10,16 +10,16 @@ declare global {
 
 
 type LandingProps = {
-  setAndShowToast: (title:string, message:any, isDanger:boolean) => void
+  setAndShowToast: (title: string, message: any, isDanger: boolean) => void
 };
 
-const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
+const Landing: React.FC<LandingProps> = ({ setAndShowToast }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
   const validWalletExtentions = ['nami', 'eternl'];
-  if (selectedAWalletExtension) {navigate('/payouts')}
+  if (selectedAWalletExtension) { navigate('/payouts') }
 
-  async function connectWallet(walletName:string) {
+  async function connectWallet(walletName: string) {
     localStorage.setItem('walletProvider', walletName);
     setAndShowToast(
       `Sucessfully connected ${walletName} wallet`,
@@ -30,12 +30,12 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
   }
 
   function capitalizeFirstLetter(str: string): string {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  function renderWallets(walletName:string) {
+  function renderWallets(walletName: string) {
     if (window.cardano && window.cardano[walletName]) {
-      return(<div className="row mt-2">
+      return (<div className="row mt-2">
         <div className="col-12 bordered-container" onClick={() => connectWallet(walletName)}>
           <img src={window.cardano[walletName].icon} alt="Icon Before" className="icon" />
           {capitalizeFirstLetter(walletName)} Wallet
@@ -46,7 +46,7 @@ const Landing: React.FC<LandingProps> = ({ setAndShowToast}) => {
         </div>
       </div>)
     } else {
-      return(
+      return (
         <div className="row mt-2">
           <div className="col-12 bordered-container">
             Please install {walletName} wallet extension to use app
