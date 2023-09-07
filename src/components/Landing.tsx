@@ -7,8 +7,6 @@ declare global {
   }
 }
 
-
-
 type LandingProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
 };

@@ -29,7 +29,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   const [availablePayouts, setAvailablePayouts] = useState<PayoutAvailable[]>([])
   const [withdrawnPayouts, setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
   const [payoutIdsToBeWithdrawn, setPayoutIdsToBeWithdrawn] = useState<string[]>([]);
-  const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
+  const [, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,7 +160,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
 
   const handleWithdrawals = async () => {
     if (sdk) {
-      await setIsLoading(true)
+      setIsLoading(true)
       await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
         , TE.chain(() => sdk.payouts.withdrawn(O.none))
         , TE.map(newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts) })
@@ -191,9 +191,9 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
               false
             )
           }))()
-      await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-      await setIsLoading(false)
-      await setPayoutIdsToBeWithdrawn([])
+      setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+      setIsLoading(false)
+      setPayoutIdsToBeWithdrawn([])
     }
   }
 
