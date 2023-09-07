@@ -161,6 +161,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   const handleWithdrawals = async () => {
     if (sdk) {
       setIsLoading(true)
+      try {
       await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
         , TE.chain(() => sdk.payouts.withdrawn(O.none))
         , TE.map(newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts) })
@@ -191,6 +192,13 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
               false
             )
           }))()
+      } catch (err : any) {
+        setAndShowToast(
+          'Payouts withdrawal failed',
+          <span className='text-color-white'>{err.info}</span>,
+          false
+        )
+      }
       setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
       setIsLoading(false)
       setPayoutIdsToBeWithdrawn([])
