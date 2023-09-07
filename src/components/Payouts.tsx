@@ -12,7 +12,6 @@ import { pipe } from 'fp-ts/lib/function';
 import './Payouts.scss';
 
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
-import Spinner from './Spinner';
 
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
@@ -56,6 +55,12 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
     setShowModal(false);
   };
 
+  const closeModalAndClearPayouts = () => {
+    setShowModal(false);
+    setPayoutIdsToBeWithdrawn([]);
+    setIsLoading(false);
+  };
+
   const fetchData = async () => {
     if (!selectedAWalletExtension) { navigate('/'); }
     else {
@@ -97,8 +102,16 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   }
 
   useEffect(() => {
-    fetchData().catch(console.error)
+    fetchData().catch(err => console.error(err));
+
+    const intervalId = setInterval(() => {
+      fetchData().catch(err => console.error(err));
+    }, 10000); // 10000 milliseconds or 10 seconds
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(intervalId);
   }, [selectedAWalletExtension, navigate]);
+
 
   const copyToClipboard = async () => {
     try {
@@ -200,8 +213,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
         )
       }
       setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-      setIsLoading(false)
-      setPayoutIdsToBeWithdrawn([])
+      closeModalAndClearPayouts()
     }
   }
 
@@ -284,8 +296,13 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
                           <td className='py-3'>{[...intersperse(formatAssets(payout.assets, false), ',')]}</td>
                           <td className='py-3'>
                             {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
-                              ? <Spinner size={7} /> :
-                              <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                              ? <button disabled className='btn btn-primary'>
+                                  <span className="pl-2 spinner-border spinner-border-sm text-white " role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                  </span>
+                                  <span> Processing...</span>
+                                </button>
+                              : <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
                                 Withdraw
                               </button>
                             }
@@ -341,7 +358,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
         </div>
       </div>
 
-      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn} handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
+      <PayoutsModal showModal={showModal} onCancel={closeModalAndClearPayouts} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn} handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
     </div>
   );
 };
