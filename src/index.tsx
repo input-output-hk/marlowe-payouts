@@ -8,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './styles/main.scss';
 
-
 //  2) Get a reference to the div with ID root
 const el = document.getElementById('root');
 

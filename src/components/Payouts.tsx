@@ -1,11 +1,10 @@
 // Payouts.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PayoutsModal from './PayoutsModal';
 import { Browser } from "@marlowe.io/runtime-lifecycle"
 import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/dist/apis/runtimeLifecycle"
-import { unAddressBech32,PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn } from "@marlowe.io/runtime-core"
+import { unAddressBech32, PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn } from "@marlowe.io/runtime-core"
 import * as O from 'fp-ts/lib/Option.js'
 import * as TE from "fp-ts/lib/TaskEither"
 import * as E from "fp-ts/lib/Either"
@@ -18,36 +17,36 @@ import Spinner from './Spinner';
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
 type PayoutsProps = {
-  setAndShowToast: (title:string, message:any, isDanger:boolean) => void
+  setAndShowToast: (title: string, message: any, isDanger: boolean) => void
 };
 
-const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
+const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
-  if (!selectedAWalletExtension) {navigate('/');}
+  if (!selectedAWalletExtension) { navigate('/'); }
   const [sdk, setSdk] = useState<RuntimeLifecycle>();
-  const [changeAddress,setChangeAddress] = useState<string>('')
-  const [availablePayouts,setAvailablePayouts] = useState<PayoutAvailable[]>([])
-  const [withdrawnPayouts,setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
+  const [changeAddress, setChangeAddress] = useState<string>('')
+  const [availablePayouts, setAvailablePayouts] = useState<PayoutAvailable[]>([])
+  const [withdrawnPayouts, setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
   const [payoutIdsToBeWithdrawn, setPayoutIdsToBeWithdrawn] = useState<string[]>([]);
-  const [payoutIdsWithdrawnInProgress, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
+  const [, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [firstTabContentClassNames, setFirstTabContentClassNames] = useState('tab-pane fade show active');
   const [secondTabContentClassNames, setSecondTabContentClassNames] = useState('tab-pane fade d-none');
 
-  const toggleTabContentClassNames = () => { 
+  const toggleTabContentClassNames = () => {
     setFirstTabContentClassNames(firstTabContentClassNames === 'tab-pane fade show active' ? 'tab-pane fade d-none' : 'tab-pane fade show active');
     setSecondTabContentClassNames(secondTabContentClassNames === 'tab-pane fade d-none' ? 'tab-pane fade show active' : 'tab-pane fade d-none');
   }
 
-  const truncateString = (str:string, start:number, end:number) => {
+  const truncateString = (str: string, start: number, end: number) => {
     const length = str.length;
     const lastLetterIndex = length - 1;
-    return str.slice(0,start) + '....' + str.slice(end,lastLetterIndex)
+    return str.slice(0, start) + '....' + str.slice(end, lastLetterIndex)
   }
-  const truncatedAddress = truncateString(changeAddress,11,102)
+  const truncatedAddress = truncateString(changeAddress, 11, 102)
 
   const openModal = () => {
     setShowModal(true);
@@ -58,33 +57,33 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
   };
 
   const fetchData = async () => {
-    if (!selectedAWalletExtension) {navigate('/');}
+    if (!selectedAWalletExtension) { navigate('/'); }
     else {
-      const runtimeLifecycle =  await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
+      const runtimeLifecycle = await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
       setSdk(runtimeLifecycle)
       const newChangeAddress = await runtimeLifecycle.wallet.getChangeAddress()
       setChangeAddress(unAddressBech32(newChangeAddress))
-      await pipe( runtimeLifecycle.payouts.available (O.none)
-                ,TE.match(  
-                    (err) => {
-                      console.log("Error", err);
-                      const response = err?.request?.response;
-                      if (!response) {return}
-                      const error = JSON.parse(response);
-                      const { message } = error;
-                      setAndShowToast(
-                        'Available Payouts Request Failed',
-                        <span className='text-color-white'>{message}</span>,
-                        true
-                      );
-                    },
-                    a => setAvailablePayouts(a)))()
-      await pipe( runtimeLifecycle.payouts.withdrawn (O.none)
-      ,TE.match(  
+      await pipe(runtimeLifecycle.payouts.available(O.none)
+        , TE.match(
           (err) => {
             console.log("Error", err);
             const response = err?.request?.response;
-            if (!response) {return}
+            if (!response) { return }
+            const error = JSON.parse(response);
+            const { message } = error;
+            setAndShowToast(
+              'Available Payouts Request Failed',
+              <span className='text-color-white'>{message}</span>,
+              true
+            );
+          },
+          a => setAvailablePayouts(a)))()
+      await pipe(runtimeLifecycle.payouts.withdrawn(O.none)
+        , TE.match(
+          (err) => {
+            console.log("Error", err);
+            const response = err?.request?.response;
+            if (!response) { return }
             const error = JSON.parse(response);
             const { message } = error;
             setAndShowToast(
@@ -130,7 +129,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
     navigate('/');
   }
 
-  const toggleBundleWithdrawal = (payoutId:string) => {
+  const toggleBundleWithdrawal = (payoutId: string) => {
     setIsLoading(true);
     let newState = [...payoutIdsToBeWithdrawn];
     if (newState.includes(payoutId)) {
@@ -161,18 +160,18 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
 
   const handleWithdrawals = async () => {
     if (sdk) {
-      await setIsLoading(true)
+      setIsLoading(true)
       await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
-        , TE.chain (() => sdk.payouts.withdrawn (O.none))
-        , TE.map (newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts)})
-        , TE.chain (() => sdk.payouts.available (O.none))
-        , TE.map (newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
+        , TE.chain(() => sdk.payouts.withdrawn(O.none))
+        , TE.map(newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts) })
+        , TE.chain(() => sdk.payouts.available(O.none))
+        , TE.map(newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts) })
         , TE.match(
           (err) => {
             const response = err.request.response;
-            if (!response) {return}
+            if (!response) { return }
             const error = JSON.parse(response);
-            const {message} = error;
+            const { message } = error;
             console.error('Failed to withdraw payouts: ', error);
             setAndShowToast(
               'Failed to withdraw payouts',
@@ -182,21 +181,23 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
               </div>
               ,
               true
-            )},
+            )
+          },
           () => {
             setPayoutIdsWithdrawnInProgress([])
             setAndShowToast(
               'Payouts withdrawn',
               <span className='text-color-white'>Successfully withdrawn payouts.</span>,
               false
-            )}))()
-      await setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-      await setIsLoading(false)
-      await setPayoutIdsToBeWithdrawn([])
-    } 
+            )
+          }))()
+      setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
+      setIsLoading(false)
+      setPayoutIdsToBeWithdrawn([])
+    }
   }
 
-  const payoutSelectedToBeWithdrawn = (payoutId:string) => {
+  const payoutSelectedToBeWithdrawn = (payoutId: string) => {
     return payoutIdsToBeWithdrawn.includes(payoutId);
   }
 
@@ -272,14 +273,14 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                             </a>
                           </td>
                           <td className='py-3'>{payout.role.assetName}</td>
-                          <td className='py-3'>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                          <td className='py-3'>{[...intersperse(formatAssets(payout.assets, false), ',')]}</td>
                           <td className='py-3'>
-                                {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
-                                ? <Spinner size={7} /> :
-                                  <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                                    Withdraw
-                                  </button>
-                                }
+                            {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
+                              ? <Spinner size={7} /> :
+                              <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
+                                Withdraw
+                              </button>
+                            }
                           </td>
                         </tr>
                       ))}
@@ -314,13 +315,13 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
                     <tbody>
                       {withdrawnPayouts.map((payout, index) => (
                         <tr key={index}>
-                          <td className='py-3'><a target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}> 
-                                    {shortViewTxOutRef(unContractId(payout.contractId))} </a>
-                            </td>
+                          <td className='py-3'><a target="_blank"
+                            rel="noopener noreferrer"
+                            href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                            {shortViewTxOutRef(unContractId(payout.contractId))} </a>
+                          </td>
                           <td className='py-3'>{payout.role.assetName}</td>
-                          <td className='py-3'>{ [...intersperse ( formatAssets(payout.assets,false),',')]}</td>
+                          <td className='py-3'>{[...intersperse(formatAssets(payout.assets, false), ',')]}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -332,7 +333,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
         </div>
       </div>
 
-      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn}  handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
+      <PayoutsModal showModal={showModal} closeModal={closeModal} payoutsToBeWithdrawn={payoutsToBeWithdrawn} handleWithdrawals={handleWithdrawals} changeAddress={changeAddress} />
     </div>
   );
 };
