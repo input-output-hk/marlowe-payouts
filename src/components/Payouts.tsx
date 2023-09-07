@@ -66,11 +66,33 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
       setChangeAddress(unAddressBech32(newChangeAddress))
       await pipe( runtimeLifecycle.payouts.available (O.none)
                 ,TE.match(  
-                    (err) => console.log("Error", err),
+                    (err) => {
+                      console.log("Error", err);
+                      const response = err?.request?.response;
+                      if (!response) {return}
+                      const error = JSON.parse(response);
+                      const { message } = error;
+                      setAndShowToast(
+                        'Available Payouts Request Failed',
+                        <span className='text-color-white'>{message}</span>,
+                        true
+                      );
+                    },
                     a => setAvailablePayouts(a)))()
       await pipe( runtimeLifecycle.payouts.withdrawn (O.none)
       ,TE.match(  
-          (err) => console.log("Error", err),
+          (err) => {
+            console.log("Error", err);
+            const response = err?.request?.response;
+            if (!response) {return}
+            const error = JSON.parse(response);
+            const { message } = error;
+            setAndShowToast(
+              'Withdrawn Payouts Request Failed',
+              <span className='text-color-white'>{message}</span>,
+              true
+            );
+          },
           a => setWithdrawnPayouts(a)))()
     }
   }
@@ -89,6 +111,11 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
       );
     } catch (err) {
       console.error('Failed to copy address: ', err);
+      setAndShowToast(
+        'Failed to copy address',
+        <span className='text-color-white'>Failed to copy change address to clipboard.</span>,
+        true
+      );
     }
   };
 
@@ -143,6 +170,7 @@ const Payouts: React.FC<PayoutsProps> = ({setAndShowToast}) => {
         , TE.match(
           (err) => {
             const response = err.request.response;
+            if (!response) {return}
             const error = JSON.parse(response);
             const {message} = error;
             console.error('Failed to withdraw payouts: ', error);
