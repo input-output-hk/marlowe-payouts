@@ -9,9 +9,10 @@ interface PayoutsModalProps {
   payoutsToBeWithdrawn: PayoutAvailable[];
   changeAddress: string;
   handleWithdrawals: () => void;
+  onCancel: () => void;
 }
 
-const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payoutsToBeWithdrawn, changeAddress, handleWithdrawals }) => {
+const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, onCancel, payoutsToBeWithdrawn, changeAddress, handleWithdrawals }) => {
   return (
     <>
       <div className={`modal ${showModal ? 'show' : ''}`} tabIndex={-1} style={{ display: showModal ? 'block' : 'none' }}>
@@ -22,11 +23,6 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
                 <div className='row'>
                   <div className='col-10 text-left'>
                     <h5 className="modal-title">Confirm Withdrawal</h5>
-                  </div>
-                  <div className='col-2 text-right'>
-                    <button type="button" className="close btn btn-outline-secondary" onClick={closeModal}>
-                      <span aria-hidden="true">&times;</span>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -65,12 +61,12 @@ const PayoutsModal: React.FC<PayoutsModalProps> = ({ showModal, closeModal, payo
               <div className='container'>
                 <div className='row'>
                   <div className='col'>
-                    <button type="button" className="btn btn-outline-secondary w-100" onClick={closeModal}>
+                    <button type="button" className="btn btn-outline-secondary w-100" onClick={onCancel}>
                       Cancel
                     </button>
                   </div>
                   <div className='col'>
-                    <button type="button" className="btn btn-primary w-100" onClick={x => { handleWithdrawals(); closeModal() }}>
+                    <button type="button" className="btn btn-primary w-100" onClick={() => {handleWithdrawals(); closeModal(); }}>
                       Confirm
                     </button>
                   </div>
