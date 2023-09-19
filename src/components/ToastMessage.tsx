@@ -18,7 +18,7 @@ const ToastMessage: React.FC<ToastProps> = ({ id, title, message, show, onClose,
         <strong className="me-auto">{title}</strong>
         <button type="button" className="ml-2 mb-1 btn-close" aria-label="Close" onClick={() => onClose(id)} />
       </div>
-      <div className="toast-body">
+      <div className="toast-body" style={{ maxHeight: '150px', overflowY: 'auto' }}>
         {message}
       </div>
     </div>

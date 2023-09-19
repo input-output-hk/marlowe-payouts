@@ -175,11 +175,22 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
     if (sdk) {
       setIsLoading(true)
       try {
-      await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
-        , TE.chain(() => sdk.payouts.withdrawn(O.none))
+        setAndShowToast(
+          'Please sign your transaction',
+          <div>
+            <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
+          </div>
+          ,
+          false
+        )
+
+        await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
+        , TE.chain(() => {
+          return sdk.payouts.withdrawn(O.none);
+        })
         , TE.map(newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts) })
         , TE.chain(() => sdk.payouts.available(O.none))
-        , TE.map(newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts) })
+        , TE.map(newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
         , TE.match(
           (err) => {
             const response = err.request.response;
@@ -187,6 +198,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
             const error = JSON.parse(response);
             const { message } = error;
             console.error('Failed to withdraw payouts: ', error);
+            closeModalAndClearPayouts()
             setAndShowToast(
               'Failed to withdraw payouts',
               <div>
@@ -198,7 +210,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
             )
           },
           () => {
-            setPayoutIdsWithdrawnInProgress([])
+            closeModalAndClearPayouts()
             setAndShowToast(
               'Payouts withdrawn',
               <span className='text-color-white'>Successfully withdrawn payouts.</span>,
@@ -206,6 +218,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
             )
           }))()
       } catch (err : any) {
+        closeModalAndClearPayouts()
         setAndShowToast(
           'Payouts withdrawal failed',
           <span className='text-color-white'>{err.info}</span>,
@@ -213,7 +226,6 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
         )
       }
       setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-      closeModalAndClearPayouts()
     }
   }
 
@@ -303,7 +315,14 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
                                   <span> Processing...</span>
                                 </button>
                               : <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                                Withdraw
+                                { isLoading ?
+                                  <span>
+                                    <span className="pl-2 spinner-border spinner-border-sm text-white " role="status">
+                                      <span className="visually-hidden">Loading...</span>
+                                    </span>
+                                    <span> Please wait...</span>
+                                  </span>
+                                  : 'Withdraw'}
                               </button>
                             }
                           </td>
