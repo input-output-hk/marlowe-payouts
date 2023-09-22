@@ -5,14 +5,16 @@
 
 let
 
+  nodejs = pkgs.nodejs-18_x;
+
 in
 
 {
   # name = "nix-shell";
   # prompt = "$ ";
-  welcomeMessage = "Marlowe Runner";
+  welcomeMessage = "Marlowe Payouts";
   packages = [
-    pkgs.nodejs-18_x
+    nodejs
   ];
   # scripts = { };
   # env = { };

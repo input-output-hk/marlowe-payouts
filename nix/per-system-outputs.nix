@@ -3,16 +3,14 @@
 
 { iogxRepoRoot, repoRoot, inputs, inputs', pkgs, system, lib, projects ? null, ... }:
 
-let
-
-in
-
 {
-  packages = { };
+  packages = {
+    marlowe-payouts = repoRoot.nix.marlowe-payouts.default;
+  };
   # checks = { };
   # apps = { };
-  # operables = ();
-  # oci-images = {};
+  operables = repoRoot.nix.marlowe-payouts.deploy.operable;
+  oci-images = repoRoot.nix.marlowe-payouts.deploy.oci-image;
   # nomadTasks = { };
   # foobar = { };
 }

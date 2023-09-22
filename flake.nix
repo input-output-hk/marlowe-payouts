@@ -1,7 +1,8 @@
+# This file is part of the IOGX template and is documented at the link below:
 # https://www.github.com/input-output-hk/iogx#31-flakenix
 
 {
-  description = "Change the description field in your flake.nix";
+  description = "Marlowe Withdraw dapp";
 
   inputs = {
     iogx.url = "github:input-output-hk/iogx";
@@ -10,6 +11,10 @@
       url = "github:divnix/std";
       inputs.n2c.follows = "n2c";
       # devshell.url = "github:numtide/devshell";
+    };
+    npmlock2nix = {
+      url = "github:nix-community/npmlock2nix";
+      flake = false;
     };
   };
 

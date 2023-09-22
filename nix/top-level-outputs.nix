@@ -3,4 +3,4 @@
 
 { repoRoot, inputs, lib, ... }:
 
-{ z = repoRoot; w = inputs; }
+{ }
