@@ -210,7 +210,7 @@ services:
     ports:
     - 3780:3780
 
-  marlowe-runner:
+  marlowe-payouts:
     image: ghrc.io/input-output-hk/marlowe-payouts:latest
     environment:
     - MARLOWE_RT_WEBSERVER_URL=${MARLOWE_RT_WEBSERVER_URL:?err}

@@ -2,7 +2,7 @@
 # https://www.github.com/input-output-hk/iogx#31-flakenix
 
 {
-  description = "Marlowe Withdraw dapp";
+  description = "Marlowe withdraw dapp";
 
   inputs = {
     iogx.url = "github:input-output-hk/iogx";

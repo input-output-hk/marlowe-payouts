@@ -12,7 +12,7 @@ in
 {
   # name = "nix-shell";
   # prompt = "$ ";
-  welcomeMessage = "Marlowe Payouts";
+  welcomeMessage = "Marlowe withdraw dapp";
   packages = [
     nodejs
   ];

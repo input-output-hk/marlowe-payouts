@@ -14,7 +14,7 @@ let
       uid = "0";
       gid = "0";
       labels = {
-        description = "Marlowe Withdraw dapp.";
+        description = "Marlowe withdraw dapp.";
         source = "https://github.com/input-output-hk/marlowe-payouts";
         license = "Apache-2.0";
       };
