@@ -13,5 +13,5 @@ skopeo --insecure-policy copy nix:result docker://docker.io/mydocker/marlowe-pay
 
 Run the container and connect to `http://localhost:8080`.
 ```bash
-docker run -p 8080:8080 mydocker/marlowe-payouts
+docker run -p 8080:8080 ghcr.io/input-output-hk/marlowe-payouts
 ```
