@@ -6,6 +6,8 @@
 let
 
   nodejs = pkgs.nodejs-18_x;
+  skopeo = inputs'.n2c.packages.skopeo-nix2container;
+  docker = pkgs.docker;
 
 in
 
@@ -15,6 +17,8 @@ in
   welcomeMessage = "Marlowe withdraw dapp";
   packages = [
     nodejs
+    skopeo
+    docker
   ];
   # scripts = { };
   # env = { };
