@@ -1,46 +1,49 @@
-# Getting Started with Create React App
+# Marlowe Payouts
+
+<img align="right" src="public/images/marlowe-logo-primary.svg" >
+
+Marlowe Payouts is a decentralized application (dApp) designed to help users discover payouts available for withdrawal from Marlowe contracts on the Cardano blockchain. With a user-friendly interface and seamless integration with the Cardano network, Marlowe Payouts simplifies the process of tracking and withdrawing your payouts.
+
+This dApp was built using the [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk), a robust SDK for Marlowe development on the Cardano blockchain.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Discover Payouts:** Easily find payouts available for withdrawal from Marlowe Contracts.
+- **User-Friendly Interface:** A clean and intuitive design ensures a smooth user experience.
+- **Secure:** Built with the security and reliability of the Cardano blockchain in mind.
 
-### `npm start`
+## Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To get the dApp up and running on your local machine, follow these steps:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/input-output-hk/marlowe-payouts
+   cd marlowe-payouts
 
-### `npm test`
+2. **Install Dependencies**
+   ```bash
+   npm install
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. **Run the dApp**
+   ```bash
+   npm run start
 
-### `npm run build`
+## Additional Resources
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [Marlowe Documentation](https://docs.marlowe.iohk.io/docs/introduction)
+- [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk)
+- [Marlowe Starter Kit](https://github.com/input-output-hk/marlowe-starter-kit)
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React documentation](https://reactjs.org/)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Contributing
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+We welcome contributions from the community! If you'd like to contribute, please fork the repository, make your changes, and submit a pull request. Ensure that your code adheres to the project's coding standards.
 
-### `npm run eject`
+## License
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
