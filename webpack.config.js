@@ -48,4 +48,7 @@ module.exports = {
     port: 3000,
     historyApiFallback: true,
   },
+  ignoreWarnings: [
+    (warning) => warning.toString().includes("deprecated") && warning.toString().includes("sass-loader")
+  ]
 };
