@@ -48,10 +48,13 @@ body {
   .title {
     color: #000;
     font-family: Inter;
-    font-size: 1.5rem;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+  }
+
+  .font-size-1rem {
+    font-size: 1rem;
   }
 
   .card-container {
@@ -84,15 +87,6 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-  }
-
-  .title {
-    color: #000;
-    font-family: Inter;
-    font-size: 1.5rem;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
   }
 
   .grid {
