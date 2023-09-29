@@ -14,6 +14,11 @@ npmlock2nix.v2.build {
   src = ./../..;
   installPhase = "cp -r dist $out";
   buildCommands = [
+    # This line is needed to prevent the error:
+    #   Internal Error: EACCES: permission denied, mkdir '/homeless-shelter'
+    # See https://github.com/NixOS/nix/issues/670#issuecomment-1211700127
+    "export HOME=$(pwd)"
+    "echo $HOME"
     "npm run build"
     "cp -r public/* dist/"
   ];
