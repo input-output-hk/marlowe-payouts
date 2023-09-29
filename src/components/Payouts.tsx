@@ -153,10 +153,12 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
     try {
         setIsLoading(true)
         setAndShowToast(
-            'Please sign your transaction',
-            <div>
-              <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
-            </div>,false)
+          'Please sign your transaction',
+          <div>
+            <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
+          </div>,
+          false
+        )
         
         await runtimeLifecycle.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
   
@@ -164,7 +166,8 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
         setAndShowToast(
           'Payouts withdrawn',
           <span className='text-color-white'>Successfully withdrawn payouts.</span>,
-          false) 
+          false
+        ) 
     } catch (err : any)  
       { console.log("Error", err);
         const error = JSON.parse(err);
