@@ -1,11 +1,7 @@
+import { getAvailableWallets } from '@marlowe.io/wallet/browser';
 import React, { } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-declare global {
-  interface Window {
-    cardano: any;
-  }
-}
 
 type LandingProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
@@ -14,7 +10,7 @@ type LandingProps = {
 const Landing: React.FC<LandingProps> = ({ setAndShowToast }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
-  const validWalletExtentions = ['nami', 'eternl'];
+  const validWalletExtentions = getAvailableWallets()
   if (selectedAWalletExtension) { navigate('/payouts') }
 
   async function connectWallet(walletName: string) {

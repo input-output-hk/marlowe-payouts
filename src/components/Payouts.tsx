@@ -2,16 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PayoutsModal from './PayoutsModal';
-import { Browser } from "@marlowe.io/runtime-lifecycle"
-import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/dist/apis/runtimeLifecycle"
-import { unAddressBech32, PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn } from "@marlowe.io/runtime-core"
-import * as O from 'fp-ts/lib/Option.js'
-import * as TE from "fp-ts/lib/TaskEither"
-import * as E from "fp-ts/lib/Either"
-import { pipe } from 'fp-ts/lib/function';
+
+import { BrowserRuntimeLifecycleOptions, mkRuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/browser"
+import { RuntimeLifecycle } from '@marlowe.io/runtime-lifecycle/api';
+
+
+import { unAddressBech32, PayoutAvailable, unPayoutId, unContractId, PayoutWithdrawn, AddressBech32 } from "@marlowe.io/runtime-core"
 import './Payouts.scss';
 
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
+import { SupportedWallet } from '@marlowe.io/wallet/browser';
 
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 
@@ -23,18 +23,21 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
   if (!selectedAWalletExtension) { navigate('/'); }
-  const [sdk, setSdk] = useState<RuntimeLifecycle>();
+
+  const [runtimeLifecycle, setRuntimeLifecycle] = useState<RuntimeLifecycle>();
+
   const [changeAddress, setChangeAddress] = useState<string>('')
   const [availablePayouts, setAvailablePayouts] = useState<PayoutAvailable[]>([])
   const [withdrawnPayouts, setWithdrawnPayouts] = useState<PayoutWithdrawn[]>([])
   const [payoutIdsToBeWithdrawn, setPayoutIdsToBeWithdrawn] = useState<string[]>([]);
-  const [, setPayoutIdsWithdrawnInProgress] = useState<string[]>([]);
-  const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
+
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [firstTabContentClassNames, setFirstTabContentClassNames] = useState('tab-pane fade show active');
   const [secondTabContentClassNames, setSecondTabContentClassNames] = useState('tab-pane fade d-none');
 
+  const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
+  
   const toggleTabContentClassNames = () => {
     setFirstTabContentClassNames(firstTabContentClassNames === 'tab-pane fade show active' ? 'tab-pane fade d-none' : 'tab-pane fade show active');
     setSecondTabContentClassNames(secondTabContentClassNames === 'tab-pane fade d-none' ? 'tab-pane fade show active' : 'tab-pane fade d-none');
@@ -60,57 +63,33 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
     setPayoutIdsToBeWithdrawn([]);
     setIsLoading(false);
   };
-
-  const fetchData = async () => {
-    if (!selectedAWalletExtension) { navigate('/'); }
-    else {
-      const runtimeLifecycle = await Browser.mkRuntimeLifecycle(runtimeURL)(selectedAWalletExtension)()
-      setSdk(runtimeLifecycle)
-      const newChangeAddress = await runtimeLifecycle.wallet.getChangeAddress()
-      setChangeAddress(unAddressBech32(newChangeAddress))
-      await pipe(runtimeLifecycle.payouts.available(O.none)
-        , TE.match(
-          (err) => {
-            console.log("Error", err);
-            const response = err?.request?.response;
-            if (!response) { return }
-            const error = JSON.parse(response);
-            const { message } = error;
-            setAndShowToast(
-              'Available Payouts Request Failed',
-              <span className='text-color-white'>{message}</span>,
-              true
-            );
-          },
-          a => setAvailablePayouts(a)))()
-      await pipe(runtimeLifecycle.payouts.withdrawn(O.none)
-        , TE.match(
-          (err) => {
-            console.log("Error", err);
-            const response = err?.request?.response;
-            if (!response) { return }
-            const error = JSON.parse(response);
-            const { message } = error;
-            setAndShowToast(
-              'Withdrawn Payouts Request Failed',
-              <span className='text-color-white'>{message}</span>,
-              true
-            );
-          },
-          a => setWithdrawnPayouts(a)))()
-    }
-  }
-
+  
   useEffect(() => {
-    fetchData().catch(err => console.error(err));
+    const fetchData = async () => {
+      const runtimeLifecycleParameters : BrowserRuntimeLifecycleOptions = { runtimeURL:runtimeURL, walletName:selectedAWalletExtension as SupportedWallet}
+      const runtimeLifecycle = await mkRuntimeLifecycle(runtimeLifecycleParameters).then((a) => {setRuntimeLifecycle(a);return a})
+      await runtimeLifecycle.wallet.getChangeAddress().then((changeAddress : AddressBech32) => setChangeAddress(unAddressBech32(changeAddress) ))
+      await runtimeLifecycle.payouts.available().then(setAvailablePayouts)
+      await runtimeLifecycle.payouts.withdrawn().then(setWithdrawnPayouts)
+    }
+
+    fetchData()
+      .catch(err => 
+        { console.log("Error", err);
+          const error = JSON.parse(err);
+          const { message } = error;
+          setAndShowToast(
+            'Failed Retrieving Payouts Infornation',
+            <span className='text-color-white'>{message}</span>,
+            true)
+        })
 
     const intervalId = setInterval(() => {
       fetchData().catch(err => console.error(err));
-    }, 10000); // 10000 milliseconds or 10 seconds
-
+    }, 10_000); // 10 seconds
     // Clear the interval when the component is unmounted
     return () => clearInterval(intervalId);
-  }, [selectedAWalletExtension, navigate]);
+  }, [selectedAWalletExtension, navigate, setAndShowToast]);
 
 
   const copyToClipboard = async () => {
@@ -166,68 +145,40 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
       <div className='text-color-white'>
         <span>This payout bundle might be too big to go on chain.</span>
         <span> Please consider breaking up your payouts into smaller bundles.</span>
-      </div>,
-      true
-    );
+      </div>,true)
   }
 
   const handleWithdrawals = async () => {
-    if (sdk) {
-      setIsLoading(true)
-      try {
+    if (runtimeLifecycle) {
+    try {
+        setIsLoading(true)
         setAndShowToast(
-          'Please sign your transaction',
-          <div>
-            <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
-          </div>
-          ,
-          false
-        )
-
-        await pipe(sdk.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
-        , TE.chain(() => {
-          return sdk.payouts.withdrawn(O.none);
-        })
-        , TE.map(newWithdrawnPayouts => { return setWithdrawnPayouts(newWithdrawnPayouts) })
-        , TE.chain(() => sdk.payouts.available(O.none))
-        , TE.map(newWAvailablePayouts => { return setAvailablePayouts(newWAvailablePayouts)})
-        , TE.match(
-          (err) => {
-            const response = err.request.response;
-            if (!response) { return }
-            const error = JSON.parse(response);
-            const { message } = error;
-            console.error('Failed to withdraw payouts: ', error);
-            closeModalAndClearPayouts()
-            setAndShowToast(
-              'Failed to withdraw payouts',
-              <div>
-                <p className='text-color-white'>Message from Server: </p>
-                <p className='text-color-white'>{message}</p>
-              </div>
-              ,
-              true
-            )
-          },
-          () => {
-            closeModalAndClearPayouts()
-            setAndShowToast(
-              'Payouts withdrawn',
-              <span className='text-color-white'>Successfully withdrawn payouts.</span>,
-              false
-            )
-          }))()
-      } catch (err : any) {
+            'Please sign your transaction',
+            <div>
+              <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
+            </div>,false)
+        
+        await runtimeLifecycle.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
+  
+        closeModalAndClearPayouts()
+        setAndShowToast(
+          'Payouts withdrawn',
+          <span className='text-color-white'>Successfully withdrawn payouts.</span>,
+          false) 
+    } catch (err : any)  
+      { console.log("Error", err);
+        const error = JSON.parse(err);
+        const { message } = error;
         closeModalAndClearPayouts()
         setAndShowToast(
           'Payouts withdrawal failed',
-          <span className='text-color-white'>{err.info}</span>,
-          false
-        )
-      }
-      setPayoutIdsWithdrawnInProgress(payoutIdsToBeWithdrawn)
-    }
-  }
+          <div>
+            <p className='text-color-white'>Message from Server: </p>
+            <p className='text-color-white'>{message}</p>
+          </div>
+          ,
+          true
+        )}}}
 
   const payoutSelectedToBeWithdrawn = (payoutId: string) => {
     return payoutIdsToBeWithdrawn.includes(payoutId);
@@ -383,4 +334,3 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
 };
 
 export default Payouts;
-
