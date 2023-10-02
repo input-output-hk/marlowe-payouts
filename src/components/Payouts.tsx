@@ -145,7 +145,9 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
       <div className='text-color-white'>
         <span>This payout bundle might be too big to go on chain.</span>
         <span> Please consider breaking up your payouts into smaller bundles.</span>
-      </div>,true)
+      </div>,
+      true
+    )
   }
 
   const handleWithdrawals = async () => {
@@ -153,10 +155,12 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
     try {
         setIsLoading(true)
         setAndShowToast(
-            'Please sign your transaction',
-            <div>
-              <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
-            </div>,false)
+          'Please sign your transaction',
+          <div>
+            <p className='text-color-white'>When your wallet opens, please sign the transaction to submit the payout for processing. This may take a few minutes to process and confirm on the chain.</p>
+          </div>,
+          false
+        )
         
         await runtimeLifecycle.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
   
@@ -164,7 +168,8 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
         setAndShowToast(
           'Payouts withdrawn',
           <span className='text-color-white'>Successfully withdrawn payouts.</span>,
-          false) 
+          false
+        ) 
     } catch (err : any)  
       { console.log("Error", err);
         const error = JSON.parse(err);
@@ -187,7 +192,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   return (
     <div className="container">
       <div className="header">
-        <img src="/images/marlowe-logo-primary.svg" alt="Logo" className="mb-4" />
+        <img src="/images/marlowe-logo-primary.svg" alt="Logo" width="120px" className="mb-4" />
         <div className="connected-wallet-details">
           <div className="dropdown">
             <button className="btn btn-light btn-sm dropdown-toggle mr-2" title="menu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -213,12 +218,12 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
       <ul className='nav nav-tabs'>
         <li className='nav-item'>
           <a className='nav-link active' href='#available-rewards' data-bs-toggle="tab" onClick={toggleTabContentClassNames}>
-            <p className="title">Available Rewards</p>
+            <p className="title font-size-1rem">Available Rewards</p>
           </a>
         </li>
         <li className='nav-item'>
           <a className='nav-link' href='#rewards-withdrawn' data-bs-toggle="tab" onClick={toggleTabContentClassNames}>
-            <p className="title">Rewards Withdrawn</p>
+            <p className="title font-size-1rem">Rewards Withdrawn</p>
           </a>
         </li>
       </ul>
