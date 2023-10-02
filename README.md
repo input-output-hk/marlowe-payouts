@@ -4,7 +4,7 @@
 
 Marlowe Payouts is a decentralized application (dApp) designed to help users discover payouts available for withdrawal from Marlowe contracts on the Cardano blockchain. With a user-friendly interface and seamless integration with the Cardano network, Marlowe Payouts simplifies the process of tracking and withdrawing your payouts.
 
-This dApp was built using the [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk), a robust SDK for Marlowe development on the Cardano blockchain.
+This dApp was built using the [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk), a collection of JavaScript/TypeScript libraries that helps dApp developers to interact with the Marlowe ecosystem.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
