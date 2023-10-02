@@ -1,46 +1,68 @@
-# Getting Started with Create React App
+# Marlowe Payouts
+
+<img align="right" src="public/images/marlowe-logo-primary.svg" >
+
+Marlowe Payouts is a decentralized application (dApp) designed to help users discover payouts available for withdrawal from Marlowe contracts on the Cardano blockchain. With a user-friendly interface and seamless integration with the Cardano network, Marlowe Payouts simplifies the process of tracking and withdrawing your payouts.
+
+This dApp was built using the [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk), a collection of JavaScript/TypeScript libraries that helps dApp developers to interact with the Marlowe ecosystem.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Discover Payouts:** Easily find payouts available for withdrawal from Marlowe Contracts.
+- **User-Friendly Interface:** A clean and intuitive design ensures a smooth user experience.
+- **Secure:** Built with the security and reliability of the Cardano blockchain in mind.
 
-### `npm start`
+## Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To get the dApp up and running on your local machine, follow these steps:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/input-output-hk/marlowe-payouts
+   cd marlowe-payouts
 
-### `npm test`
+2. **Install Dependencies**
+   ```bash
+   npm install
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. **Run the dApp**
+   ```bash
+   npm run start
 
-### `npm run build`
+## Generating Payouts for Testing
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To generate payouts for testing purposes on the preprod and preview networks, we recommend using the **Marlowe Starter Kit**. The starter kit provides comprehensive instructions and tools, including Jupyter notebooks, to help you understand and work with Marlowe contracts.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Steps:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Clone the Marlowe Starter Kit Repository**:
+   ```bash
+   git clone https://github.com/input-output-hk/marlowe-starter-kit.git
+   cd marlowe-starter-kit
 
-### `npm run eject`
+2. **Follow the Instructions**:
+   Navigate to the [Marlowe Starter Kit repository](https://github.com/input-output-hk/marlowe-starter-kit) and follow the provided instructions to set up and run the Jupyter notebooks.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. **Generate Payouts**:
+   To generate payouts specifically, refer to [Lesson 8 - CIP45](https://github.com/input-output-hk/marlowe-starter-kit/tree/main/lessons/08-cip45) in the starter kit. This lesson provides a detailed guide on how to generate payouts for Marlowe contracts.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+By following the above steps, you can easily generate payouts for testing purposes and further explore the capabilities of Marlowe contracts on the Cardano blockchain.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Additional Resources
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- [Marlowe Documentation](https://docs.marlowe.iohk.io/docs/introduction)
+- [Marlowe-ts-sdk](https://github.com/input-output-hk/marlowe-ts-sdk)
+- [Marlowe Starter Kit](https://github.com/input-output-hk/marlowe-starter-kit)
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React documentation](https://reactjs.org/)
 
-## Learn More
+## Contributing
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+We welcome contributions from the community! If you'd like to contribute, please fork the repository, make your changes, and submit a pull request. Ensure that your code adheres to the project's coding standards.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
