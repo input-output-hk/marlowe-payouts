@@ -14,7 +14,7 @@ import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 import { SupportedWallet } from '@marlowe.io/wallet/browser';
 
 const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
-
+const marloweScanURL = `${process.env.MARLOWE_SCAN_URL}`;
 type PayoutsProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
 };
@@ -256,7 +256,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
                           <td className='py-3'>
                             <a target="_blank"
                               rel="noopener noreferrer"
-                              href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                              href={`${marloweScanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
                               {truncateString(unContractId(payout.contractId), 5, 60)}
                             </a>
                           </td>
@@ -317,7 +317,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
                         <tr key={index}>
                           <td className='py-3'><a target="_blank"
                             rel="noopener noreferrer"
-                            href={'https://preprod.marlowescan.com/contractView?tab=info&contractId=' + encodeURIComponent(unContractId(payout.contractId))}>
+                            href={`${marloweScanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
                             {shortViewTxOutRef(unContractId(payout.contractId))} </a>
                           </td>
                           <td className='py-3'>{payout.role.assetName}</td>
