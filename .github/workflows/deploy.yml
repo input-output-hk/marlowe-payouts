@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install Nix
         uses: cachix/install-nix-action@v21
         with:
@@ -27,12 +28,15 @@ jobs:
             trusted-public-keys = ${{ env.TRUSTED_PUBLIC_KEYS }}
             substituters = ${{ env.SUBSTITUTERS }}
             experimental-features = nix-command flakes
+
       - name: Build images and copy to local Docker registry
         run: |
           nix build .#oci-images.x86_64-linux.all.copyToDockerDaemon
           ./result/bin/copy-to-docker-daemon
+
       - name: Authenticate with container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
       - name: Tag and push images
         run: |
           tagAndPush() {

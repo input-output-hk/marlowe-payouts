@@ -5,7 +5,7 @@ let
   images = {
     marlowe-payouts = inputs.std.lib.ops.mkStandardOCI {
       name = "marlowe-payouts";
-      operable = repoRoot.nix.operables.marlowe-payouts;
+      operable = repoRoot.nix.deploy.operables.marlowe-payouts;
       uid = "0";
       gid = "0";
       labels = {
@@ -25,7 +25,7 @@ images // {
     copyToDockerDaemon = inputs.std.lib.ops.writeScript {
       name = "copy-to-docker-daemon";
       text = forAllImages (name: img:
-        "${inputs.n2c.skopeo-nix2container}/bin/skopeo --insecure-policy copy nix:${img} docker-daemon:${name}:latest"
+        "${inputs.n2c.packages.skopeo-nix2container}/bin/skopeo --insecure-policy copy nix:${img} docker-daemon:${name}:latest"
       );
     };
   };

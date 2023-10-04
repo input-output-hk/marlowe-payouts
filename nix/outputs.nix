@@ -9,7 +9,5 @@
     operables = repoRoot.nix.deploy.operables;
 
     oci-images = repoRoot.nix.deploy.oci-images;
-
-    hydraJobs = { inherit (inputs.self.${system}) devShells packages operables oci-images; };
   }
 ]
