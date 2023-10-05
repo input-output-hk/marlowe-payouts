@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          install_url: https://releases.nixos.org/nix/nix-2.16/install
+          extra_nix_config: |
+            extra-trusted-public-keys = "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="
+            extra-substituters = "https://cache.iog.io"
+            experimental-features = nix-command flakes
+
+      - name: Build Nix Shell
+        run: |
+          nix build .#devShells.x86_64-linux.default
+
+      - name: Build Marlowe Payouts (with Nix)
+        run: |
+          nix build .#marlowe-payouts
+
+      - name: Build Marlowe Payouts (inside nix develop)
+        run: |
+          nix develop --command bash -c 'npm install && npm run build'

@@ -4,13 +4,6 @@
   inputs = {
     iogx.url = "github:input-output-hk/iogx?ref=v4";
 
-    n2c.url = "github:nlewo/nix2container";
-    
-    std = {
-      url = "github:divnix/std";
-      inputs.n2c.follows = "n2c";
-    };
-    
     npmlock2nix = {
       url = "github:nix-community/npmlock2nix";
       flake = false;

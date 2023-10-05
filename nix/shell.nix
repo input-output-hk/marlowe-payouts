@@ -6,18 +6,9 @@ lib.iogx.mkShell {
 
   packages = [
     pkgs.nodejs-18_x
-    pkgs.docker
-    inputs.n2c.packages.skopeo-nix2container
+    pkgs.nodejs-18_x.pkgs.webpack
+    pkgs.nodejs-18_x.pkgs.webpack-cli
   ];
-
-  shellHook = ''
-    export PATH="$PATH:./node_modules/.bin/:./bin"
-  '';
-
-  # scripts = { };
-  # env = { };
-  # name = "nix-shell";
-  # prompt = "$ ";
 
   preCommit = {
     shellcheck.enable = true;
