@@ -27,6 +27,25 @@ To get the dApp up and running on your local machine, follow these steps:
    ```bash
    npm install
 
+4. **Configure Marlowe URLs in .env**
+
+   To ensure the dApp communicates correctly with the Marlowe runtime and scan instances, you need to set the appropriate URLs in the `.env` file.
+
+   ### Steps:
+
+   1. **Open the .env File**:
+      Navigate to the root directory of your project and open the `.env` file in your preferred text editor.
+
+   2. **Set the Marlowe Runtime Web URL**:
+      Locate the line `MARLOWE_RUNTIME_WEB_URL=<Your-Runtime-Instance>`. Replace `<Your-Runtime-Instance>` with the actual URL of your Marlowe runtime instance.
+
+      MARLOWE_RUNTIME_WEB_URL=https://example-runtime-url.com
+
+   3. **Set the Marlowe Scan URL**:
+      Locate the line `MARLOWE_SCAN_URL=<Your-Scan-Instance>`. Replace `<Your-Scan-Instance>` with the actual URL of your Marlowe scan instance.
+
+      MARLOWE_SCAN_URL=https://example-scan-url.com
+
 3. **Run the dApp**
    ```bash
    npm run start
