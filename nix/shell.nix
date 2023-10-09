@@ -9,6 +9,7 @@ lib.iogx.mkShell {
     pkgs.nodejs-18_x
     pkgs.nodejs-18_x.pkgs.webpack
     pkgs.nodejs-18_x.pkgs.webpack-cli
+    pkgs.python39
   ];
 
   scripts.gen-npm-deps-hash = {
