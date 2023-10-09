@@ -28,6 +28,7 @@ pkgs.buildNpmPackage {
   nativeBuildInputs = [
     pkgs.nodejs_18
     pkgs.nodejs_18.pkgs.webpack-cli
+    pkgs.python39
   ];
 
   buildPhase = ''
