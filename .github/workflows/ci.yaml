@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Marlowe Payouts (with Nix)
         run: |
-          nix build .#marlowe-payouts
+          nix build .#marlowe-payouts -L
 
       - name: Build Marlowe Payouts (inside nix develop)
         run: |

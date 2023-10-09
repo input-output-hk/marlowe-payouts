@@ -1,18 +1,15 @@
 { repoRoot, inputs, pkgs, lib, system }:
 
-let
+pkgs.buildNpmPackage {
 
-  npmlock2nix = import inputs.npmlock2nix { inherit pkgs; };
+  pname = "marlowe-payouts";
 
-in
-
-npmlock2nix.v2.build {
-
-  nodejs = pkgs.nodejs-18_x;
+  version = "0.1.0";
 
   src = lib.sourceByRegex ../. [
     "^src.*"
     "^public.*"
+    "^contract.*"
     "^.env$"
     "^package-lock.json$"
     "^package.json$"
@@ -20,15 +17,25 @@ npmlock2nix.v2.build {
     "^webpack.config.js$"
   ];
 
-  installPhase = "cp -r dist $out";
+  # buildNpmPackage is able to make a pure nix build by using npmDepsHash.
+  # That is the hash of package-lock.json.
+  # Its value is generated using the prefetch-npm-deps command (see shell.nix).
+  # We set dontNpmBuild and dontNpmInstall to true to significantly speed up the 
+  # build: this works because we have a custom buildPhase that invokes webpack-cli
+  # explicitely.
+  npmDepsHash = import ./gen/npm-deps-hash.nix;
 
-  buildCommands = [
-    # This line is needed to prevent the error:
-    #   Internal Error: EACCES: permission denied, mkdir '/homeless-shelter'
-    # See https://github.com/NixOS/nix/issues/670#issuecomment-1211700127
-    "export HOME=$(whoami)"
-
-    "npm run build"
-    "cp -r public/* dist/"
+  nativeBuildInputs = [
+    pkgs.nodejs_18
+    pkgs.nodejs_18.pkgs.webpack-cli
   ];
+
+  buildPhase = ''
+    mkdir -p $out
+    npm run build
+    cp -r {dist,public}/* $out
+  '';
+
+  dontNpmBuild = true;
+  dontNpmInstall = true;
 }

@@ -1,13 +1,8 @@
 {
-  description = "Marlowe Withdraw dApp";
+  description = "Marlowe withdraw dapp";
 
   inputs = {
     iogx.url = "github:input-output-hk/iogx?ref=v4";
-
-    npmlock2nix = {
-      url = "github:nix-community/npmlock2nix";
-      flake = false;
-    };
   };
 
 
