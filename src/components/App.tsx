@@ -6,7 +6,12 @@ import Payouts from './Payouts';
 import ToastMessage from './ToastMessage';
 import { Navigate } from 'react-router-dom';
 
-const App: React.FC = () => {
+interface AppProps extends React.PropsWithChildren<{}> {
+  runtimeURL: string;
+}
+
+const App: React.FC<AppProps> = ({runtimeURL}) => {
+
   const hasSelectedAWalletExtension = localStorage.getItem('walletProvider');
   const [toasts, setToasts] = useState<any[]>([]);
 
@@ -23,7 +28,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={hasSelectedAWalletExtension ? <Navigate to="/payouts" /> : <Landing setAndShowToast={setAndShowToast} />} />
-        <Route path="/payouts" element={hasSelectedAWalletExtension ? <Payouts setAndShowToast={setAndShowToast} /> : <Navigate to="/" />} />
+        <Route path="/payouts" element={hasSelectedAWalletExtension ? <Payouts setAndShowToast={setAndShowToast} runtimeURL={runtimeURL} /> : <Navigate to="/" />} />
       </Routes>
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         {toasts.map(toast => (

@@ -13,13 +13,13 @@ import './Payouts.scss';
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 import { SupportedWallet } from '@marlowe.io/wallet/browser';
 
-let runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 const marloweScanURL = `${process.env.MARLOWE_SCAN_URL}`;
 type PayoutsProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
+  runtimeURL: string
 };
 
-const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
+const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
   if (!selectedAWalletExtension) { navigate('/'); }
@@ -66,15 +66,6 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   
   useEffect(() => {
     const fetchData = async () => {
-      await fetch(`/config.json`).then(async (res) => {
-        if (res.status === 200) {
-          const { marloweWebServerUrl } = await res.json();
-          if (!!marloweWebServerUrl) {
-            runtimeURL = marloweWebServerUrl;
-          }
-        }
-      });
-
       const runtimeLifecycleParameters: BrowserRuntimeLifecycleOptions = {
         runtimeURL: runtimeURL,
         walletName: selectedAWalletExtension as SupportedWallet,
