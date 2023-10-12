@@ -31,8 +31,8 @@ if (!el) {
 const root = ReactDOM.createRoot(el);
 
 // 4) Show the component on the screen
-if (hasValidRuntimeInstance) {
-  root.render(<App runtimeURL={runtimeURL || 'DEFAULT_VALUE'} />);
+if (hasValidRuntimeInstance && runtimeURL) {
+  root.render(<App runtimeURL={runtimeURL} />);
 } else {
   alert("Missing valid config.json file with marloweWebServerUrl OR env keys are not set")
 }
