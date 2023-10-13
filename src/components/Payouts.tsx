@@ -13,13 +13,13 @@ import './Payouts.scss';
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 import { SupportedWallet } from '@marlowe.io/wallet/browser';
 
-const runtimeURL = `${process.env.MARLOWE_RUNTIME_WEB_URL}`;
 const marloweScanURL = `${process.env.MARLOWE_SCAN_URL}`;
 type PayoutsProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
+  runtimeURL: string
 };
 
-const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
+const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
   if (!selectedAWalletExtension) { navigate('/'); }
@@ -66,11 +66,26 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast }) => {
   
   useEffect(() => {
     const fetchData = async () => {
-      const runtimeLifecycleParameters : BrowserRuntimeLifecycleOptions = { runtimeURL:runtimeURL, walletName:selectedAWalletExtension as SupportedWallet}
-      const runtimeLifecycle = await mkRuntimeLifecycle(runtimeLifecycleParameters).then((a) => {setRuntimeLifecycle(a);return a})
-      await runtimeLifecycle.wallet.getChangeAddress().then((changeAddress : AddressBech32) => setChangeAddress(unAddressBech32(changeAddress) ))
-      await runtimeLifecycle.payouts.available().then(setAvailablePayouts)
-      await runtimeLifecycle.payouts.withdrawn().then(setWithdrawnPayouts)
+      const runtimeLifecycleParameters: BrowserRuntimeLifecycleOptions = {
+        runtimeURL: runtimeURL,
+        walletName: selectedAWalletExtension as SupportedWallet,
+      };
+      const runtimeLifecycle = await mkRuntimeLifecycle(runtimeLifecycleParameters).then(
+        (a) => {
+          setRuntimeLifecycle(a);
+          return a;
+        }
+      );
+      await runtimeLifecycle.wallet
+        .getChangeAddress()
+        .then((changeAddress: AddressBech32) =>
+          setChangeAddress(unAddressBech32(changeAddress))
+        );
+      await runtimeLifecycle.payouts
+        .available()
+        .then(setAvailablePayouts);
+      await runtimeLifecycle.payouts.withdrawn().then(setWithdrawnPayouts);
+
     }
 
     fetchData()
