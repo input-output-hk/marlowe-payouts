@@ -8,9 +8,10 @@ import { Navigate } from 'react-router-dom';
 
 interface AppProps extends React.PropsWithChildren<{}> {
   runtimeURL: string;
+  scanURL: string;
 }
 
-const App: React.FC<AppProps> = ({runtimeURL}) => {
+const App: React.FC<AppProps> = ({ runtimeURL, scanURL }) => {
 
   const hasSelectedAWalletExtension = localStorage.getItem('walletProvider');
   const [toasts, setToasts] = useState<any[]>([]);
@@ -28,7 +29,7 @@ const App: React.FC<AppProps> = ({runtimeURL}) => {
     <Router>
       <Routes>
         <Route path="/" element={hasSelectedAWalletExtension ? <Navigate to="/payouts" /> : <Landing setAndShowToast={setAndShowToast} />} />
-        <Route path="/payouts" element={hasSelectedAWalletExtension ? <Payouts setAndShowToast={setAndShowToast} runtimeURL={runtimeURL} /> : <Navigate to="/" />} />
+        <Route path="/payouts" element={hasSelectedAWalletExtension ? <Payouts setAndShowToast={setAndShowToast} runtimeURL={runtimeURL} scanURL={scanURL} /> : <Navigate to="/" />} />
       </Routes>
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         {toasts.map(toast => (
