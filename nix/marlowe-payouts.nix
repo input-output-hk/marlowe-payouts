@@ -28,7 +28,10 @@ pkgs.buildNpmPackage {
   nativeBuildInputs = [
     pkgs.nodejs_18
     pkgs.nodejs_18.pkgs.webpack-cli
-    pkgs.python39
+    pkgs.python310
+  ] ++ lib.optionals pkgs.stdenv.isDarwin [
+    # Needed by node-gyp on macOS, which uses the xcrun program.
+    pkgs.xcbuild
   ];
 
   buildPhase = ''
