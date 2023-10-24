@@ -1,0 +1,152 @@
+{{- range $index, $network := .Values.networks }}
+---
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: marlowe-payouts-{{ $network }}
+  namespace: marlowe-production
+spec:
+  components:
+    - name: marlowe-payouts-{{ $network }}
+      properties:
+        image: p3terx/darkhttpd
+        args:
+          - /client-www
+          - --port
+          - "8080"
+        imagePullPolicy: Always
+        ports:
+          - expose: true
+            port: 8080
+            protocol: TCP
+      traits:
+        - properties:
+            replicas: 1
+          type: scaler
+        - properties:
+            domains:
+              - payouts-{{ $network }}.prod.scdev.aws.iohkdev.io
+            rules:
+              - port: 8080
+          type: https-route
+        - type: init-container
+          properties:
+            name: load-payouts-client
+            image: ghcr.io/input-output-hk/marlowe-payouts:{{ $.Values.images.productionTag }}
+            args:
+              - -c
+              - |
+                  root="$(dirname $(readlink -f /profile/index.html))"
+                  cp -a $root/* /share/marlowe-payouts/static
+                  cat > /share/marlowe-payouts/static/config.json <<EOF
+                  {
+                    "marloweWebServerUrl": "https://marlowe-runtime-{{ $network }}-web.demo.scdev.aws.iohkdev.io",
+                  }
+                  EOF
+            mountName: client-www
+            initMountPath: /share/marlowe-payouts/static
+            appMountPath: /client-www
+      type: webservice
+  policies:
+    - name: marlowe-payouts-staging
+      properties:
+        clusters:
+          - local
+        namespace: marlowe-staging
+      type: topology
+
+    - name: marlowe-payouts
+      properties:
+        clusters:
+          - local
+        namespace: marlowe-production
+      type: topology
+
+    - name: staging-override
+      type: override
+      properties:
+        components:
+          - name: marlowe-payouts-{{ $network }}
+            properties:
+              image: p3terx/darkhttpd
+              args:
+                - /client-www
+                - --port
+                - "8080"
+              imagePullPolicy: Always
+              ports:
+                - expose: true
+                  port: 8080
+                  protocol: TCP
+            traits:
+              - properties:
+                  replicas: 1
+                type: scaler
+              - properties:
+                  domains:
+                    - payouts-{{ $network }}.scdev.aws.iohkdev.io
+                  rules:
+                    - port: 8080
+                type: https-route
+              - type: init-container
+                properties:
+                  name: load-payouts-client
+                  image: ghcr.io/input-output-hk/marlowe-payouts:{{ $.Values.images.stagingTag }}
+                  args:
+                    - -c
+                    - |
+                        root="$(dirname $(readlink -f /profile/index.html))"
+                        cp -a $root/* /share/marlowe-payouts/static
+                        cat > /share/marlowe-payouts/static/config.json <<EOF
+                        {
+                          "marloweWebServerUrl": "https://marlowe-runtime-{{ $network }}-web.demo.scdev.aws.iohkdev.io",
+                        }
+                        EOF
+                  mountName: client-www
+                  initMountPath: /share/marlowe-payouts/static
+                  appMountPath: /client-www
+            type: webservice
+  workflow:
+    mode:
+      steps: DAG
+    steps:
+      - meta:
+          alias: Push staging image
+        name: push-image-staging
+        type: build-nix-image
+        properties:
+          image: ghcr.io/input-output-hk/marlowe-payouts:{{ $.Values.images.stagingTag }}
+          requests:
+            ephemeralStorage: 25Gi
+          includedFlakeURIs:
+            - "github:input-output-hk/marlowe-payouts?ref={{ $.Values.images.stagingTag }}#marlowe-payouts"
+      - meta:
+          alias: Push image
+        name: push-image
+        type: build-nix-image
+        properties:
+          image: ghcr.io/input-output-hk/marlowe-payouts:{{ $.Values.images.productionTag }}
+          requests:
+            ephemeralStorage: 25Gi
+          includedFlakeURIs:
+            - "github:input-output-hk/marlowe-payouts?ref={{ $.Values.images.productionTag }}#marlowe-payouts"
+      - type: deploy
+        meta:
+          alias: Deploy marlowe-payouts
+        dependsOn:
+          - push-image
+        name: marlowe-payouts
+        properties:
+          policies:
+            - marlowe-payouts
+      - type: deploy
+        meta:
+          alias: Deploy marlowe-payouts to staging
+        dependsOn:
+          - push-image-staging
+        name: marlowe-payouts-staging
+        properties:
+          policies:
+            - marlowe-payouts-staging
+            - staging-override
+{{- end }}

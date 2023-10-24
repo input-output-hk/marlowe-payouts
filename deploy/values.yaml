@@ -1,0 +1,8 @@
+---
+networks:
+  - preprod
+  - preview
+  - mainnet
+images:
+  stagingTag: "908e1db"
+  productionTag: "908e1db"

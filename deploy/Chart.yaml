@@ -1,0 +1,7 @@
+apiVersion: v2
+name: marlowe-payouts
+version: v1.0.0
+description: dApp for Marlowe Withdrawals
+home: https://github.com/input-output-hk/marlowe-payouts
+sources:
+  - https://github.com/input-output-hk/marlowe-payouts
