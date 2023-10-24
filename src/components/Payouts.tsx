@@ -13,13 +13,13 @@ import './Payouts.scss';
 import { formatAssets, intersperse, shortViewTxOutRef } from './Format';
 import { SupportedWallet } from '@marlowe.io/wallet/browser';
 
-const marloweScanURL = `${process.env.MARLOWE_SCAN_URL}`;
 type PayoutsProps = {
   setAndShowToast: (title: string, message: any, isDanger: boolean) => void
-  runtimeURL: string
+  runtimeURL: string,
+  scanURL: string
 };
 
-const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
+const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL, scanURL }) => {
   const navigate = useNavigate();
   const selectedAWalletExtension = localStorage.getItem('walletProvider');
   if (!selectedAWalletExtension) { navigate('/'); }
@@ -37,7 +37,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
   const [secondTabContentClassNames, setSecondTabContentClassNames] = useState('tab-pane fade d-none');
 
   const payoutsToBeWithdrawn = availablePayouts.filter(payout => payoutIdsToBeWithdrawn.includes(unPayoutId(payout.payoutId)))
-  
+
   const toggleTabContentClassNames = () => {
     setFirstTabContentClassNames(firstTabContentClassNames === 'tab-pane fade show active' ? 'tab-pane fade d-none' : 'tab-pane fade show active');
     setSecondTabContentClassNames(secondTabContentClassNames === 'tab-pane fade d-none' ? 'tab-pane fade show active' : 'tab-pane fade d-none');
@@ -63,7 +63,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
     setPayoutIdsToBeWithdrawn([]);
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const runtimeLifecycleParameters: BrowserRuntimeLifecycleOptions = {
@@ -89,15 +89,15 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
     }
 
     fetchData()
-      .catch(err => 
-        { console.log("Error", err);
-          const error = JSON.parse(err);
-          const { message } = error;
-          setAndShowToast(
-            'Failed Retrieving Payouts Infornation',
-            <span className='text-color-white'>{message}</span>,
-            true)
-        })
+      .catch(err => {
+        console.log("Error", err);
+        const error = JSON.parse(err);
+        const { message } = error;
+        setAndShowToast(
+          'Failed Retrieving Payouts Infornation',
+          <span className='text-color-white'>{message}</span>,
+          true)
+      })
 
     const intervalId = setInterval(() => {
       fetchData().catch(err => console.error(err));
@@ -167,7 +167,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
 
   const handleWithdrawals = async () => {
     if (runtimeLifecycle) {
-    try {
+      try {
         setIsLoading(true)
         setAndShowToast(
           'Please sign your transaction',
@@ -176,17 +176,17 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
           </div>,
           false
         )
-        
+
         await runtimeLifecycle.payouts.withdraw(payoutsToBeWithdrawn.map(payout => payout.payoutId))
-  
+
         closeModalAndClearPayouts()
         setAndShowToast(
           'Payouts withdrawn',
           <span className='text-color-white'>Successfully withdrawn payouts.</span>,
           false
-        ) 
-    } catch (err : any)  
-      { console.log("Error", err);
+        )
+      } catch (err: any) {
+        console.log("Error", err);
         const error = JSON.parse(err);
         const { message } = error;
         closeModalAndClearPayouts()
@@ -198,7 +198,10 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
           </div>
           ,
           true
-        )}}}
+        )
+      }
+    }
+  }
 
   const payoutSelectedToBeWithdrawn = (payoutId: string) => {
     return payoutIdsToBeWithdrawn.includes(payoutId);
@@ -271,7 +274,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
                           <td className='py-3'>
                             <a target="_blank"
                               rel="noopener noreferrer"
-                              href={`${marloweScanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
+                              href={`${scanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
                               {truncateString(unContractId(payout.contractId), 5, 60)}
                             </a>
                           </td>
@@ -280,13 +283,13 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
                           <td className='py-3'>
                             {isLoading && payoutSelectedToBeWithdrawn(unPayoutId(payout.payoutId))
                               ? <button disabled className='btn btn-primary'>
-                                  <span className="pl-2 spinner-border spinner-border-sm text-white " role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                  </span>
-                                  <span> Processing...</span>
-                                </button>
+                                <span className="pl-2 spinner-border spinner-border-sm text-white " role="status">
+                                  <span className="visually-hidden">Loading...</span>
+                                </span>
+                                <span> Processing...</span>
+                              </button>
                               : <button disabled={isLoading} className='btn btn-primary' onClick={() => toggleBundleWithdrawal(unPayoutId(payout.payoutId))}>
-                                { isLoading ?
+                                {isLoading ?
                                   <span>
                                     <span className="pl-2 spinner-border spinner-border-sm text-white " role="status">
                                       <span className="visually-hidden">Loading...</span>
@@ -332,7 +335,7 @@ const Payouts: React.FC<PayoutsProps> = ({ setAndShowToast, runtimeURL }) => {
                         <tr key={index}>
                           <td className='py-3'><a target="_blank"
                             rel="noopener noreferrer"
-                            href={`${marloweScanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
+                            href={`${scanURL}/contractView?tab=info&contractId=` + encodeURIComponent(unContractId(payout.contractId))}>
                             {shortViewTxOutRef(unContractId(payout.contractId))} </a>
                           </td>
                           <td className='py-3'>{payout.role.assetName}</td>

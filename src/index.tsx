@@ -10,35 +10,43 @@ import './styles/main.scss';
 import { mkRestClient } from "@marlowe.io/runtime-rest-client";
 
 let runtimeURL = process.env.MARLOWE_RUNTIME_WEB_URL;
+let scanURL = process.env.MARLOWE_SCAN_URL;
 await fetch(`/config.json`).then(async (res) => {
   if (res.status === 200) {
-    const { marloweWebServerUrl } = await res.json();
+    const { marloweWebServerUrl, marloweScanURL } = await res.json();
     if (!!marloweWebServerUrl) {
       runtimeURL = marloweWebServerUrl;
+    }
+    if (!!marloweScanURL) {
+      scanURL = marloweScanURL;
     }
   }
 });
 
-if (runtimeURL === undefined || runtimeURL === null) {
-  alert("Missing valid config.json file with marloweWebServerUrl OR env keys are not set!")
-} else {
-  const restClient = mkRestClient(runtimeURL)
-  const hasValidRuntimeInstance = await restClient.healthcheck()
+const CONFIGURATION_ERROR = Symbol()
 
-  if (!hasValidRuntimeInstance) {
-    alert("Invalid runtime instance set!")
-  } else {
-    //  2) Get a reference to the div with ID root
-    const el = document.getElementById('root');
+try {
+  if (typeof runtimeURL !== "string")
+    throw new Error("Missing valid config.json file with marloweWebServerUrl OR env MARLOWE_RUNTIME_WEB_URL is not set!", { cause: CONFIGURATION_ERROR });
 
-    if (!el) {
-      throw new Error('Root element not found');
-    }
+  if (typeof scanURL !== "string")
+    throw new Error("Missing valid config.json file with marloweScanURL OR env MARLOWE_SCAN_URL is not set!", { cause: CONFIGURATION_ERROR });
 
-    //  3) Tell React to take control of that element
-    const root = ReactDOM.createRoot(el);
+  const restClient = mkRestClient(runtimeURL);
+  const hasValidRuntimeInstance = await restClient.healthcheck();
 
-    // 4) Show the component on the screen
-    root.render(<App runtimeURL={runtimeURL} />);
-  }
+  if (!hasValidRuntimeInstance)
+    throw new Error("Invalid runtime instance set!", { cause: CONFIGURATION_ERROR });
+
+  const el = document.getElementById('root');
+
+  if (!el)
+    throw new Error('Root element not found');
+
+  const root = ReactDOM.createRoot(el);
+  root.render(<App runtimeURL={runtimeURL} scanURL={scanURL} />);
+} catch (e) {
+  if (e instanceof Error && e.cause === CONFIGURATION_ERROR)
+    alert(e.message);
+  else throw e
 }
