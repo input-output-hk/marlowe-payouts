@@ -40,7 +40,7 @@ spec:
                   cp -a $root/* /share/marlowe-payouts/static
                   cat > /share/marlowe-payouts/static/config.json <<EOF
                   {
-                    "marloweWebServerUrl": "https://marlowe-runtime-{{ $network }}-demo-web.scdev.aws.iohkdev.io",
+                    "marloweWebServerUrl": "https://marlowe-runtime-{{ $network }}-demo-web.test.scdev.aws.iohkdev.io",
                     "marloweScanURL": "https://{{ $network }}.marlowescan.com"
                   }
                   EOF
