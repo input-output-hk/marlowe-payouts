@@ -50,6 +50,20 @@ To get the dApp up and running on your local machine, follow these steps:
    ```bash
    npm run start
 
+## Development with Nix
+
+This repository uses nix to provide the development and build environment.
+
+If you know nix, simply run `nix develop` to enter the shell; if prompted, trust 
+the flake config values to enable access to our binary caches.   
+
+The nix code is based on a template from the the 
+[IOGX flake](https://github.com/input-output-hk/iogx). 
+For instructions on how to install and configure nix (including how to enable 
+access to our binary caches), and how keep the flake inputs up to date, refer to 
+[this section](https://github.com/input-output-hk/iogx/blob/main/doc/api.md#flakenix)
+of the IOGX manual.
+
 ## Generating Payouts for Testing
 
 To generate payouts for testing purposes on the preprod and preview networks, we recommend using the **Marlowe Starter Kit**. The starter kit provides comprehensive instructions and tools, including Jupyter notebooks, to help you understand and work with Marlowe contracts.
