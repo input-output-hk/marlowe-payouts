@@ -54,15 +54,9 @@ To get the dApp up and running on your local machine, follow these steps:
 
 This repository uses nix to provide the development and build environment.
 
-If you know nix, simply run `nix develop` to enter the shell; if prompted, trust 
-the flake config values to enable access to our binary caches.   
+For instructions on how to install and configure nix (including how to enable access to our binary caches), refer to [this document](https://github.com/input-output-hk/iogx/blob/main/doc/nix-setup-guide.md). 
 
-The nix code is based on a template from the the 
-[IOGX flake](https://github.com/input-output-hk/iogx). 
-For instructions on how to install and configure nix (including how to enable 
-access to our binary caches), and how keep the flake inputs up to date, refer to 
-[this section](https://github.com/input-output-hk/iogx/blob/main/doc/api.md#flakenix)
-of the IOGX manual.
+If you already have nix installed and configured, you may enter the development shell by running `nix develop`.
 
 ## Generating Payouts for Testing
 
